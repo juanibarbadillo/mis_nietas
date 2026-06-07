@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regionales Mis Nietas — Productos regionales en San Rafael</title>
     <meta name="description" content="Productos regionales de elaboración propia en San Rafael, Mendoza: dulce de leche y mermeladas artesanales, vinos caseros, aceite de oliva, conservas y frutos secos. Pedí online por WhatsApp.">
+    <meta property="og:title" content="Regionales Mis Nietas — Sabores caseros de San Rafael">
+    <meta property="og:description" content="Dulce de leche, mermeladas, vinos caseros, aceite de oliva, conservas y frutos secos de elaboración propia. Pedí online por WhatsApp.">
+    <meta property="og:image" content="/img/hero.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&family=Caveat:wght@700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/styles.css?v=20260515c">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css?v=20260607">
 </head>
 <body>
     <!-- Header -->
@@ -18,7 +23,9 @@
             </div>
             <nav class="nav-desktop">
                 <a href="#menu">Catálogo</a>
-                <a href="/u/pedido.html">Mi Pedido</a>
+                <a href="#nosotros">Nosotros</a>
+                <a href="#horarios">Contacto</a>
+                <a href="/u/pedido.html" class="nav-cta">Mi Pedido</a>
             </nav>
             <div class="hamburger" onclick="toggleMenu()">
                 <span></span>
@@ -35,8 +42,9 @@
             <button type="button" class="sidebar-close" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
             <a href="/u/index.html">Inicio</a>
             <a href="#menu" onclick="toggleMenu()">Catálogo</a>
+            <a href="#nosotros" onclick="toggleMenu()">Nosotros</a>
             <a href="/u/pedido.html" onclick="toggleMenu()">Mi Pedido</a>
-            <a href="#horarios" onclick="toggleMenu()">Horarios</a>
+            <a href="#horarios" onclick="toggleMenu()">Horarios y contacto</a>
         </div>
     </div>
 
@@ -49,28 +57,97 @@
     <section id="hero" class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
+            <p class="hero-kicker">Atuel Norte · San Rafael · Mendoza</p>
             <h1 id="negocio-nombre">Regionales Mis Nietas</h1>
-            <p class="subtitle">Productos regionales · elaboración propia</p>
-            <!--<a href="#menu" class="btn-primary">COMENZAR PEDIDO</a>-->
+            <p class="subtitle">Sabores caseros, como los de la abuela</p>
+            <div class="hero-cta">
+                <a href="#menu" class="btn-hero btn-hero--primary">Ver catálogo</a>
+                <a href="/u/pedido.html" class="btn-hero btn-hero--ghost">Hacer un pedido</a>
+            </div>
         </div>
     </section>
 
-    <!-- Menú Section -->
+    <!-- Franja de confianza -->
+    <section class="trust-band" aria-label="Por qué elegirnos">
+        <div class="container trust-grid">
+            <div class="trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2h8M7 6h10M6 9h12v9a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4z"/><path d="M9 13h6"/></svg>
+                <div><strong>Elaboración propia</strong><small>Recetas artesanales</small></div>
+            </div>
+            <div class="trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                <div><strong>En San Rafael</strong><small>Envíos a domicilio</small></div>
+            </div>
+            <div class="trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                <div><strong>Pago fácil</strong><small>Efectivo o transferencia</small></div>
+            </div>
+            <div class="trust-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+                <div><strong>Pedí por WhatsApp</strong><small>Coordinamos al instante</small></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Catálogo -->
     <section id="menu" class="menu">
         <div class="container">
-            <!--h2>Menú</h2-->
+            <div class="section-intro">
+                <p class="kicker">Nuestros productos</p>
+                <h2>Catálogo</h2>
+                <p class="section-sub">Elegí tus productos, sumalos al pedido y lo coordinamos por WhatsApp.</p>
+            </div>
             <div id="menu-dynamic"></div>
         </div>
     </section>
 
-    <!-- Horarios Section -->
+    <!-- Nosotros -->
+    <section id="nosotros" class="nosotros">
+        <div class="container nosotros-grid">
+            <div class="nosotros-media">
+                <img src="/img/nosotros.jpg" alt="Conservas artesanales de Regionales Mis Nietas" loading="lazy">
+            </div>
+            <div class="nosotros-text">
+                <p class="kicker">Nuestra historia</p>
+                <h2>Un emprendimiento familiar</h2>
+                <p>En <strong>Regionales Mis Nietas</strong> hacemos las cosas como se hacían antes: dulce de leche, mermeladas, conservas, vinos caseros y aceite de oliva, todo de <strong>elaboración propia</strong> y con productos de la zona.</p>
+                <p>Desde <strong>Atuel Norte, San Rafael (Mendoza)</strong>, llevamos el verdadero sabor casero a tu mesa.</p>
+                <a href="#menu" class="btn-primary">Ver el catálogo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Horarios y contacto -->
     <section id="horarios" class="horarios">
         <div class="container">
-            <h2>Horarios</h2>
-            <div class="product-card">
-                <div class="product-info">
-                    <p class= "horario"><strong>Lunes a sábado de <br>9 a 13 hs y de 17 a 21 hs</strong></p>
-                    <p>Para hacer pedidos estamos disponibles todos los días por WhatsApp.</p>
+            <div class="section-intro">
+                <p class="kicker">Visitanos</p>
+                <h2>Horarios y contacto</h2>
+            </div>
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                    </div>
+                    <h3>Horarios</h3>
+                    <p><strong>Lunes a sábado</strong><br>9 a 13 hs · 17 a 21 hs</p>
+                    <p class="muted">Pedidos por WhatsApp todos los días.</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <h3>Dónde estamos</h3>
+                    <p>Atuel Norte<br>San Rafael, Mendoza</p>
+                    <a href="https://www.google.com/maps/search/?api=1&query=Regionales%20Mis%20Nietas%20San%20Rafael" target="_blank" rel="noopener" class="link-accent">Ver en Google Maps →</a>
+                </div>
+                <div class="info-card">
+                    <div class="info-ico" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+                    </div>
+                    <h3>Contacto</h3>
+                    <p id="footer-tel">Telefono: —</p>
+                    <a href="https://instagram.com/regionales.misnietas" target="_blank" rel="noopener" class="link-accent">@regionales.misnietas →</a>
                 </div>
             </div>
         </div>
@@ -78,10 +155,20 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <div class="container">
-            <p>Instagram: <a href="https://instagram.com/regionales.misnietas" target="_blank">@regionales.misnietas</a></p>
-            <p>Ubicación: Atuel Norte, San Rafael, Mendoza</p>
-            <p id="footer-tel">Telefono: —</p>
+        <div class="container footer-grid">
+            <div class="footer-col">
+                <div class="footer-brand">Regionales Mis Nietas</div>
+                <p>Productos regionales de elaboración propia.<br>Atuel Norte · San Rafael · Mendoza</p>
+            </div>
+            <nav class="footer-links" aria-label="Navegación del pie">
+                <a href="#menu">Catálogo</a>
+                <a href="#nosotros">Nosotros</a>
+                <a href="/u/pedido.html">Mi Pedido</a>
+                <a href="https://instagram.com/regionales.misnietas" target="_blank" rel="noopener">Instagram</a>
+            </nav>
+        </div>
+        <div class="footer-bottom">
+            <p>© Regionales Mis Nietas · San Rafael, Mendoza</p>
         </div>
     </footer>
 
