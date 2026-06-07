@@ -1,6 +1,10 @@
 import { bootstrapDashPage, mountDashShell } from '../../shared/dashboard-shell.js'
 import { actualizarNegocio } from '../../services/negocios.service.js'
-import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, TEXT_GROUPS, findById, findPreset } from '../../theme-config.js'
+import { subirImagenBranding } from '../../services/storage.service.js'
+import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, TEXT_GROUPS, IMAGE_FIELDS, findById, findPreset } from '../../theme-config.js'
+
+// Estado de las imágenes (clave -> URL). Se inicializa desde tema.imagenes.
+const imagenesState = {}
 
 // Orden en que se muestran los pickers de color
 const COLOR_ORDER = ['primary', 'accent', 'secondary', 'bg', 'text', 'desc', 'border']
@@ -142,6 +146,82 @@ function readFuentes() {
     }
 }
 
+// Reescala la imagen en un canvas y devuelve un Blob liviano.
+function fileToBlob(file, cfg) {
+    return new Promise((resolve, reject) => {
+        const img = new Image()
+        const url = URL.createObjectURL(file)
+        img.onload = () => {
+            URL.revokeObjectURL(url)
+            let w = img.naturalWidth, h = img.naturalHeight
+            const scale = Math.min(1, cfg.maxW / w, cfg.maxH / h)
+            w = Math.max(1, Math.round(w * scale))
+            h = Math.max(1, Math.round(h * scale))
+            const canvas = document.createElement('canvas')
+            canvas.width = w; canvas.height = h
+            const ctx = canvas.getContext('2d')
+            if (cfg.format === 'jpeg') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h) }
+            ctx.drawImage(img, 0, 0, w, h)
+            const mime = cfg.format === 'png' ? 'image/png' : 'image/jpeg'
+            canvas.toBlob(b => b ? resolve(b) : reject(new Error('toBlob null')), mime, cfg.format === 'jpeg' ? 0.82 : undefined)
+        }
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('no se pudo leer la imagen')) }
+        img.src = url
+    })
+}
+
+function buildImagenes(negocioId) {
+    const cont = document.getElementById('ap-imagenes')
+    cont.innerHTML = IMAGE_FIELDS.map(f => `
+        <div class="ap-img-field" data-key="${f.key}">
+            <h4>${f.label}</h4>
+            <p class="ap-img-hint">${f.hint}</p>
+            <img class="ap-img-thumb" data-thumb="${f.key}" src="${imagenesState[f.key] || f.def}" alt="">
+            <div class="ap-img-actions">
+                <input type="file" accept="image/*" data-file="${f.key}">
+                <button type="button" class="ap-img-remove" data-remove="${f.key}" ${imagenesState[f.key] ? '' : 'hidden'}>Quitar</button>
+            </div>
+            <p class="ap-img-status" data-status="${f.key}"></p>
+        </div>`).join('')
+
+    IMAGE_FIELDS.forEach(cfg => {
+        const fileInp = cont.querySelector(`input[data-file="${cfg.key}"]`)
+        const thumb = cont.querySelector(`img[data-thumb="${cfg.key}"]`)
+        const status = cont.querySelector(`p[data-status="${cfg.key}"]`)
+        const removeBtn = cont.querySelector(`button[data-remove="${cfg.key}"]`)
+
+        const setStatus = (msg, cls) => { status.textContent = msg; status.className = 'ap-img-status' + (cls ? ' ' + cls : '') }
+
+        fileInp.addEventListener('change', async () => {
+            const file = fileInp.files && fileInp.files[0]
+            if (!file) return
+            setStatus('Procesando…')
+            try {
+                const blob = await fileToBlob(file, cfg)
+                setStatus('Subiendo…')
+                const ext = cfg.format === 'png' ? 'png' : 'jpg'
+                const publicUrl = await subirImagenBranding(negocioId, cfg.key, blob, ext)
+                if (!publicUrl) { setStatus('Error al subir. Reintentá.', 'err'); return }
+                imagenesState[cfg.key] = publicUrl
+                thumb.src = publicUrl
+                removeBtn.hidden = false
+                setStatus('✓ Lista — acordate de Guardar', 'ok')
+            } catch (e) {
+                console.error('[apariencia] imagen:', e)
+                setStatus('No se pudo procesar la imagen.', 'err')
+            }
+        })
+
+        removeBtn.addEventListener('click', () => {
+            delete imagenesState[cfg.key]
+            thumb.src = cfg.def
+            fileInp.value = ''
+            removeBtn.hidden = true
+            setStatus('Volverá a la imagen por defecto al guardar.')
+        })
+    })
+}
+
 function setTextos(textos) {
     const t = textos || {}
     TEXT_GROUPS.forEach(g => g.campos.forEach(c => {
@@ -192,11 +272,13 @@ function updatePreview() {
     }
 
     const tema = (negocio.tema && typeof negocio.tema === 'object') ? negocio.tema : {}
+    if (tema.imagenes && typeof tema.imagenes === 'object') Object.assign(imagenesState, tema.imagenes)
 
     buildPresets()
     buildColorPickers()
     buildFontSelects()
     buildTextos()
+    buildImagenes(negocio.id)
 
     setColores(tema.colores || DEFAULT_COLORES)
     setFuentes(tema.fuentes)
@@ -216,7 +298,8 @@ function updatePreview() {
             preset: activePreset ? activePreset.dataset.preset : 'custom',
             colores: readColores(),
             fuentes: readFuentes(),
-            textos: readTextos()
+            textos: readTextos(),
+            imagenes: { ...imagenesState }
         }
 
         const actualizado = await actualizarNegocio(negocio.id, { tema: nuevoTema })

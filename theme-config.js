@@ -157,6 +157,15 @@ export const TEXT_GROUPS = [
     }
 ]
 
+// Imágenes de marca. `def` = imagen actual del sitio (para mostrar de referencia).
+// maxW/maxH = tamaño máximo al que se reescala antes de subir; format = jpeg|png.
+export const IMAGE_FIELDS = [
+    { key: 'hero', label: 'Foto de portada (hero)', hint: 'Fondo del inicio. Apaisada y grande.', def: '/img/hero.jpg', maxW: 1600, maxH: 1200, format: 'jpeg' },
+    { key: 'nosotros', label: 'Foto de “Nosotros”', hint: 'Imagen de la sección Nosotros.', def: '/img/nosotros.jpg', maxW: 1000, maxH: 1000, format: 'jpeg' },
+    { key: 'logo', label: 'Logo', hint: 'Va en el encabezado. PNG con fondo transparente.', def: '/img/logo.png', maxW: 800, maxH: 400, format: 'png' },
+    { key: 'favicon', label: 'Favicon (ícono de la pestaña)', hint: 'Cuadrado chico. PNG.', def: '/favicon.svg', maxW: 128, maxH: 128, format: 'png' }
+]
+
 export function findById(list, id) {
     if (!id) return null;
     return list.find(x => x.id === id) || null;

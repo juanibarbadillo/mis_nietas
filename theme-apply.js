@@ -61,10 +61,39 @@ function applyTextos(textos) {
         const v = val(el.getAttribute('data-tema-href'))
         if (v != null) el.setAttribute('href', v)
     })
+}
+
+// Imágenes de marca (URLs de Storage). Claves: hero, nosotros, logo, favicon, og.
+function applyImagenes(imagenes) {
+    if (!imagenes || typeof imagenes !== 'object') return
+    const get = k => imagenes[k] && typeof imagenes[k] === 'string' ? imagenes[k] : null
+
+    // <img data-tema-src="clave">
     document.querySelectorAll('[data-tema-src]').forEach(el => {
-        const v = val(el.getAttribute('data-tema-src'))
-        if (v != null) el.setAttribute('src', v)
+        const v = get(el.getAttribute('data-tema-src'))
+        if (v) el.setAttribute('src', v)
     })
+
+    // Fondo del hero (mantiene posición/cover del CSS)
+    const hero = get('hero')
+    if (hero) {
+        const el = document.querySelector('.hero')
+        if (el) el.style.backgroundImage = `url("${hero}")`
+    }
+
+    // Favicon
+    const fav = get('favicon')
+    if (fav) {
+        const link = document.querySelector('link[rel="icon"]')
+        if (link) { link.setAttribute('href', fav); link.removeAttribute('type') }
+    }
+
+    // og:image (preferimos 'og', si no el hero)
+    const og = get('og') || hero
+    if (og) {
+        const m = document.querySelector('meta[property="og:image"]')
+        if (m) m.setAttribute('content', og)
+    }
 }
 
 // SEO: solo en la home (donde existe el hero), para no pisar el título
@@ -92,5 +121,6 @@ export function applyTema(tema) {
     applyColores(tema.colores)
     applyFuentes(tema.fuentes)
     applyTextos(tema.textos)
+    applyImagenes(tema.imagenes)
     applySeo(tema.textos)
 }
