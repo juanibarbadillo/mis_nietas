@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apariencia — Regionales Mis Nietas</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/dashboard/dashboard.css">
+    <style>
+        .ap-hint { font-size: 13px; color: var(--color-desc); margin: -4px 0 16px; }
+        .ap-card { max-width: none; margin-bottom: 20px; }
+        .ap-card-title { font-size: 1.05rem; margin: 0 0 4px; color: var(--color-text); }
+
+        .ap-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+        @media (max-width: 920px) { .ap-layout { grid-template-columns: 1fr; } }
+
+        /* Presets */
+        .ap-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
+        .ap-preset { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid #e2e2e2; border-radius: 10px; background: #fff; cursor: pointer; text-align: left; transition: all .15s ease; }
+        .ap-preset:hover { border-color: var(--color-primary); }
+        .ap-preset.active { border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(15,73,15,0.08); }
+        .ap-preset-dots { display: flex; flex-shrink: 0; }
+        .ap-preset-dots span { width: 16px; height: 16px; border-radius: 50%; margin-left: -5px; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.06); }
+        .ap-preset-name { font-size: 12.5px; font-weight: 600; color: var(--color-text); line-height: 1.2; }
+
+        /* Pickers */
+        .ap-colores { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px 18px; }
+        .ap-color-row { display: flex; align-items: center; gap: 10px; }
+        .ap-color-row label { flex: 1; font-size: 12.5px; font-weight: 600; color: var(--color-text); }
+        .ap-color-row input[type=color] { width: 38px; height: 34px; padding: 0; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; flex-shrink: 0; }
+        .ap-color-row input[type=text] { width: 88px; flex-shrink: 0; padding: 7px 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; font-family: monospace; box-sizing: border-box; }
+
+        /* Preview */
+        .ap-preview-wrap { position: sticky; top: 90px; }
+        .ap-preview-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--color-desc); margin: 0 0 8px; }
+        .ap-preview { border-radius: 14px; overflow: hidden; border: 1px solid #e6e6e6; box-shadow: 0 6px 20px rgba(0,0,0,.06); background: var(--color-bg); }
+        .ap-prev-hero { padding: 26px 20px; text-align: center; background: linear-gradient(135deg, var(--color-primary), var(--color-accent)); color: #fff; }
+        .ap-prev-kicker { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 6px; opacity: .9; font-family: var(--font-texto); }
+        .ap-prev-title { font-family: var(--font-titulos); font-size: 1.5rem; margin: 0; line-height: 1.1; }
+        .ap-prev-accent { font-family: var(--font-acento); font-size: 1.2rem; margin: 4px 0 14px; }
+        .ap-prev-btn { display: inline-block; background: #fff; color: var(--color-primary); font-family: var(--font-texto); font-weight: 700; font-size: 13px; padding: 8px 18px; border-radius: 999px; }
+        .ap-prev-body { padding: 16px; }
+        .ap-prev-card { background: #fff; border: 1px solid var(--color-border); border-radius: 12px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; }
+        .ap-prev-card-name { font-family: var(--font-titulos); color: var(--color-text); font-size: .95rem; }
+        .ap-prev-card-price { font-family: var(--font-texto); color: var(--color-accent); font-weight: 800; }
+        .ap-prev-text { font-family: var(--font-texto); color: var(--color-text); font-size: 13px; margin: 12px 2px 0; line-height: 1.5; }
+    </style>
+</head>
+<body class="dashboard-body">
+    <div id="dash-loading" class="dash-loading">Cargando…</div>
+
+    <div id="dash-main-wrap" style="display:none;">
+        <header id="dash-header-mount"></header>
+        <aside id="dash-drawer-mount"></aside>
+
+        <main class="dash-main">
+            <div class="dash-container">
+                <div class="dash-page-header">
+                    <h2>Apariencia</h2>
+                    <span class="dash-meta">Colores, tipografías y estilo de tu sitio</span>
+                </div>
+
+                <div class="ap-layout">
+                    <div class="ap-forms">
+                        <div class="dash-form-card ap-card">
+                            <h3 class="ap-card-title">Paleta de colores</h3>
+                            <p class="ap-hint">Elegí una paleta lista y, si querés, retocá cada color a mano.</p>
+                            <div id="ap-presets" class="ap-presets"></div>
+                            <div id="ap-colores" class="ap-colores"></div>
+                        </div>
+
+                        <div class="dash-form-card ap-card">
+                            <h3 class="ap-card-title">Tipografías</h3>
+                            <p class="ap-hint">La de títulos se usa en encabezados y logo; la de texto en el resto.</p>
+                            <div class="dash-form-row">
+                                <label for="ap-font-titulos">Fuente de títulos</label>
+                                <select id="ap-font-titulos"></select>
+                            </div>
+                            <div class="dash-form-row">
+                                <label for="ap-font-texto">Fuente de texto</label>
+                                <select id="ap-font-texto"></select>
+                            </div>
+                            <div class="dash-form-row">
+                                <label for="ap-font-acento">Fuente del subtítulo manuscrito</label>
+                                <select id="ap-font-acento"></select>
+                            </div>
+                        </div>
+
+                        <p class="dash-feedback" id="ap-feedback" hidden></p>
+
+                        <div class="dash-form-actions">
+                            <button class="dash-btn-primary" id="ap-save">Guardar cambios</button>
+                            <a class="dash-btn-secondary" id="ap-ver-sitio" href="/u/index.html" target="_blank" rel="noopener">Ver mi sitio</a>
+                        </div>
+                    </div>
+
+                    <div class="ap-preview-wrap">
+                        <p class="ap-preview-label">Vista previa</p>
+                        <div class="ap-preview" id="ap-preview">
+                            <div class="ap-prev-hero">
+                                <p class="ap-prev-kicker">Atuel Norte · San Rafael</p>
+                                <h4 class="ap-prev-title">Regionales Mis Nietas</h4>
+                                <p class="ap-prev-accent">Sabores caseros</p>
+                                <span class="ap-prev-btn">Ver catálogo</span>
+                            </div>
+                            <div class="ap-prev-body">
+                                <div class="ap-prev-card">
+                                    <span class="ap-prev-card-name">Dulce de leche</span>
+                                    <span class="ap-prev-card-price">$3.500</span>
+                                </div>
+                                <p class="ap-prev-text">Productos regionales de elaboración propia, como los de la abuela.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/pages/dashboard-apariencia.js"></script>
+</body>
+</html>

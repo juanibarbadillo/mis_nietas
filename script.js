@@ -6,6 +6,7 @@ import { crearPedido } from './services/pedidos.service.js'
 import { setProductosCache, obtenerMenu, loadMenu, initializeMenu, obtenerExtrasProductos, buscarProductoPorNombre, buscarProductoPorId, cargarCacheLocal } from './menu-store.js'
 import { setUmasushiZonasCache, obtenerZonasDelivery, obtenerExtrasStored, calcularExtrasMonto, obtenerSubtotalProductos, obtenerTotalPedidoNumerico, extrasLineItems, construirMensajeWhatsApp } from './order-shared.js'
 import { calculateDelivery } from './delivery-calc.js'
+import { applyTema } from './theme-apply.js'
 import { searchAddressCoordinates, reverseGeocodeCoords, initLeafletMap, createLeafletCircle } from './maps-osm.js'
 import glutenfreeImg from '/static/glutenfree.png'
 import veggiImg from '/static/veggi.png'
@@ -50,6 +51,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     // 3. Zonas del negocio    → umasushiZonasCache (order-shared.js)
     await resolverNegocioActual();
     window.currentNegocio = currentNegocio;
+
+    // Aplicar personalización visual (colores, fuentes, textos) lo antes posible
+    if (currentNegocio && currentNegocio.tema) applyTema(currentNegocio.tema);
 
     const n = currentNegocio;
     const nombreEl = document.getElementById('negocio-nombre');
