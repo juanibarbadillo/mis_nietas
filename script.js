@@ -80,8 +80,23 @@ document.addEventListener('DOMContentLoaded', async function () {
         renderMenu();
         actualizarContadores();
         actualizarStickyBar();
+        setupHacerPedidoBtn();
     }
 });
+
+// "Hacer un pedido" (hero): si el carrito está vacío lleva al catálogo
+// para elegir productos; si ya hay algo, abre la página de pedido.
+function setupHacerPedidoBtn() {
+    const btn = document.getElementById('btn-hacer-pedido');
+    if (!btn) return;
+    btn.addEventListener('click', function (e) {
+        if (obtenerPedido().length === 0) {
+            e.preventDefault();
+            const catalogo = document.getElementById('menu');
+            if (catalogo) catalogo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+}
 
 /**
  * Cargar zonas desde Supabase y poblar `umasushiZonasCache` (order-shared.js).
@@ -389,45 +404,50 @@ function renderMenu() {
     // Setup para navegación de tabs
     const tabs = host.querySelectorAll('.menu-tab');
     const sections = host.querySelectorAll('.menu-section');
-    
-    // Marcar primer tab como activo
-    if (tabs.length > 0) {
-        tabs[0].classList.add('active');
+    const tabsScroll = host.querySelector('.menu-tabs-scroll');
+
+    // Centra horizontalmente el tab activo dentro de su barra scrolleable.
+    // Clave en mobile: si no, el tab activo queda fuera de vista y no se aprecia.
+    function centerActiveTab(tab) {
+        if (!tabsScroll || !tab) return;
+        const tabRect = tab.getBoundingClientRect();
+        const contRect = tabsScroll.getBoundingClientRect();
+        const offset = (tabRect.left - contRect.left) - (tabsScroll.clientWidth - tab.offsetWidth) / 2;
+        tabsScroll.scrollTo({ left: tabsScroll.scrollLeft + offset, behavior: 'smooth' });
     }
+
+    function setActiveTab(tab) {
+        if (!tab || tab.classList.contains('active')) return;
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        centerActiveTab(tab);
+    }
+
+    // Marcar primer tab como activo
+    if (tabs.length > 0) tabs[0].classList.add('active');
 
     // Event listener para tabs
     tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
+        tab.addEventListener('click', function () {
             const category = this.dataset.category;
             const sectionId = 'menu-section-' + category.toLowerCase().replace(/\s+/g, '-');
             const targetSection = host.querySelector('#' + sectionId);
-            
-            // Actualizar tabs activos
-            tabs.forEach(t => t.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Scroll a la sección
-            if (targetSection) {
-                targetSection.scrollIntoView({ behavior: 'auto', block: 'start' });
-            }
+            setActiveTab(this);
+            if (targetSection) targetSection.scrollIntoView({ behavior: 'auto', block: 'start' });
         });
     });
 
-    // Observer para actualizar tabs activos al hacer scroll
+    // Observer: actualiza (y centra) el tab activo al hacer scroll
     if (typeof IntersectionObserver !== 'undefined') {
         const sectionObserver = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const sectionId = entry.target.id;
-                        tabs.forEach(tab => {
-                            const tabSectionId = 'menu-section-' + tab.dataset.category.toLowerCase().replace(/\s+/g, '-');
-                            if (tabSectionId === sectionId) {
-                                tabs.forEach(t => t.classList.remove('active'));
-                                tab.classList.add('active');
-                            }
-                        });
-                    }
+                    if (!entry.isIntersecting) return;
+                    const sectionId = entry.target.id;
+                    const tab = Array.from(tabs).find(t =>
+                        ('menu-section-' + t.dataset.category.toLowerCase().replace(/\s+/g, '-')) === sectionId
+                    );
+                    if (tab) setActiveTab(tab);
                 });
             },
             { threshold: 0.3 }
