@@ -85,6 +85,52 @@ export const FONT_ACENTO = [
     { id: 'none', nombre: 'Sin manuscrita (usar la de títulos)', stack: 'var(--font-titulos)', google: null }
 ];
 
+// Textos editables del sitio público. El `placeholder` es el texto actual
+// por defecto: si el campo queda vacío, el sitio usa ese valor (fallback).
+// Cada `key` se corresponde con un data-tema="key" en u/index.html.
+export const TEXT_GROUPS = [
+    {
+        titulo: 'Portada (hero)',
+        campos: [
+            { key: 'hero_kicker', label: 'Línea superior', placeholder: 'Atuel Norte · San Rafael · Mendoza' },
+            { key: 'hero_subtitulo', label: 'Subtítulo', placeholder: 'Sabores caseros, como los de la abuela' },
+            { key: 'hero_btn_primario', label: 'Botón principal', placeholder: 'Ver catálogo' },
+            { key: 'hero_btn_secundario', label: 'Botón secundario', placeholder: 'Hacer un pedido' }
+        ]
+    },
+    {
+        titulo: 'Franja de confianza',
+        campos: [
+            { key: 'trust1_titulo', label: 'Ítem 1 · título', placeholder: 'Elaboración propia' },
+            { key: 'trust1_sub', label: 'Ítem 1 · detalle', placeholder: 'Recetas artesanales' },
+            { key: 'trust2_titulo', label: 'Ítem 2 · título', placeholder: 'En San Rafael' },
+            { key: 'trust2_sub', label: 'Ítem 2 · detalle', placeholder: 'Envíos a domicilio' },
+            { key: 'trust3_titulo', label: 'Ítem 3 · título', placeholder: 'Pago fácil' },
+            { key: 'trust3_sub', label: 'Ítem 3 · detalle', placeholder: 'Efectivo o transferencia' },
+            { key: 'trust4_titulo', label: 'Ítem 4 · título', placeholder: 'Pedí por WhatsApp' },
+            { key: 'trust4_sub', label: 'Ítem 4 · detalle', placeholder: 'Coordinamos al instante' }
+        ]
+    },
+    {
+        titulo: 'Catálogo',
+        campos: [
+            { key: 'catalogo_kicker', label: 'Línea superior', placeholder: 'Nuestros productos' },
+            { key: 'catalogo_titulo', label: 'Título', placeholder: 'Catálogo' },
+            { key: 'catalogo_sub', label: 'Bajada', textarea: true, placeholder: 'Elegí tus productos, sumalos al pedido y lo coordinamos por WhatsApp.' }
+        ]
+    },
+    {
+        titulo: 'Nosotros',
+        campos: [
+            { key: 'nosotros_kicker', label: 'Línea superior', placeholder: 'Nuestra historia' },
+            { key: 'nosotros_titulo', label: 'Título', placeholder: 'Un emprendimiento familiar' },
+            { key: 'nosotros_p1', label: 'Párrafo 1', textarea: true, placeholder: 'En Regionales Mis Nietas hacemos las cosas como se hacían antes: dulce de leche, mermeladas, conservas, vinos caseros y aceite de oliva, todo de elaboración propia.' },
+            { key: 'nosotros_p2', label: 'Párrafo 2', textarea: true, placeholder: 'Desde Atuel Norte, San Rafael (Mendoza), llevamos el verdadero sabor casero a tu mesa.' },
+            { key: 'nosotros_btn', label: 'Texto del botón', placeholder: 'Ver el catálogo' }
+        ]
+    }
+]
+
 export function findById(list, id) {
     if (!id) return null;
     return list.find(x => x.id === id) || null;

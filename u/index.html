@@ -59,12 +59,12 @@
     <section id="hero" class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <p class="hero-kicker">Atuel Norte · San Rafael · Mendoza</p>
+            <p class="hero-kicker" data-tema="hero_kicker">Atuel Norte · San Rafael · Mendoza</p>
             <h1 id="negocio-nombre">Regionales Mis Nietas</h1>
-            <p class="subtitle">Sabores caseros, como los de la abuela</p>
+            <p class="subtitle" data-tema="hero_subtitulo">Sabores caseros, como los de la abuela</p>
             <div class="hero-cta">
-                <a href="#menu" class="btn-hero btn-hero--primary">Ver catálogo</a>
-                <a href="/u/pedido.html" class="btn-hero btn-hero--ghost">Hacer un pedido</a>
+                <a href="#menu" class="btn-hero btn-hero--primary" data-tema="hero_btn_primario">Ver catálogo</a>
+                <a href="/u/pedido.html" class="btn-hero btn-hero--ghost" data-tema="hero_btn_secundario">Hacer un pedido</a>
             </div>
         </div>
     </section>
@@ -74,19 +74,19 @@
         <div class="container trust-grid">
             <div class="trust-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2h8M7 6h10M6 9h12v9a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4z"/><path d="M9 13h6"/></svg>
-                <div><strong>Elaboración propia</strong><small>Recetas artesanales</small></div>
+                <div><strong data-tema="trust1_titulo">Elaboración propia</strong><small data-tema="trust1_sub">Recetas artesanales</small></div>
             </div>
             <div class="trust-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                <div><strong>En San Rafael</strong><small>Envíos a domicilio</small></div>
+                <div><strong data-tema="trust2_titulo">En San Rafael</strong><small data-tema="trust2_sub">Envíos a domicilio</small></div>
             </div>
             <div class="trust-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-                <div><strong>Pago fácil</strong><small>Efectivo o transferencia</small></div>
+                <div><strong data-tema="trust3_titulo">Pago fácil</strong><small data-tema="trust3_sub">Efectivo o transferencia</small></div>
             </div>
             <div class="trust-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z"/></svg>
-                <div><strong>Pedí por WhatsApp</strong><small>Coordinamos al instante</small></div>
+                <div><strong data-tema="trust4_titulo">Pedí por WhatsApp</strong><small data-tema="trust4_sub">Coordinamos al instante</small></div>
             </div>
         </div>
     </section>
@@ -95,9 +95,9 @@
     <section id="menu" class="menu">
         <div class="container">
             <div class="section-intro">
-                <p class="kicker">Nuestros productos</p>
-                <h2>Catálogo</h2>
-                <p class="section-sub">Elegí tus productos, sumalos al pedido y lo coordinamos por WhatsApp.</p>
+                <p class="kicker" data-tema="catalogo_kicker">Nuestros productos</p>
+                <h2 data-tema="catalogo_titulo">Catálogo</h2>
+                <p class="section-sub" data-tema="catalogo_sub">Elegí tus productos, sumalos al pedido y lo coordinamos por WhatsApp.</p>
             </div>
             <div id="menu-dynamic"></div>
         </div>
@@ -110,11 +110,11 @@
                 <img src="/img/nosotros.jpg" alt="Conservas artesanales de Regionales Mis Nietas" loading="lazy">
             </div>
             <div class="nosotros-text">
-                <p class="kicker">Nuestra historia</p>
-                <h2>Un emprendimiento familiar</h2>
-                <p>En <strong>Regionales Mis Nietas</strong> hacemos las cosas como se hacían antes: dulce de leche, mermeladas, conservas, vinos caseros y aceite de oliva, todo de <strong>elaboración propia</strong> y con productos de la zona.</p>
-                <p>Desde <strong>Atuel Norte, San Rafael (Mendoza)</strong>, llevamos el verdadero sabor casero a tu mesa.</p>
-                <a href="#menu" class="btn-primary">Ver el catálogo</a>
+                <p class="kicker" data-tema="nosotros_kicker">Nuestra historia</p>
+                <h2 data-tema="nosotros_titulo">Un emprendimiento familiar</h2>
+                <p data-tema="nosotros_p1">En <strong>Regionales Mis Nietas</strong> hacemos las cosas como se hacían antes: dulce de leche, mermeladas, conservas, vinos caseros y aceite de oliva, todo de <strong>elaboración propia</strong> y con productos de la zona.</p>
+                <p data-tema="nosotros_p2">Desde <strong>Atuel Norte, San Rafael (Mendoza)</strong>, llevamos el verdadero sabor casero a tu mesa.</p>
+                <a href="#menu" class="btn-primary" data-tema="nosotros_btn">Ver el catálogo</a>
             </div>
         </div>
     </section>

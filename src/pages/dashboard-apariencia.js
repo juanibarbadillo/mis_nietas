@@ -1,6 +1,6 @@
 import { bootstrapDashPage, mountDashShell } from '../../shared/dashboard-shell.js'
 import { actualizarNegocio } from '../../services/negocios.service.js'
-import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, findById, findPreset } from '../../theme-config.js'
+import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, TEXT_GROUPS, findById, findPreset } from '../../theme-config.js'
 
 // Orden en que se muestran los pickers de color
 const COLOR_ORDER = ['primary', 'accent', 'secondary', 'bg', 'text', 'desc', 'border']
@@ -92,6 +92,24 @@ function buildFontSelects() {
     fill('ap-font-acento', FONT_ACENTO)
 }
 
+function escAttr(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+function buildTextos() {
+    const cont = document.getElementById('ap-textos')
+    cont.innerHTML = TEXT_GROUPS.map(g => {
+        const campos = g.campos.map(c => {
+            const ph = escAttr(c.placeholder || '')
+            const control = c.textarea
+                ? `<textarea id="ap-t-${c.key}" data-text="${c.key}" rows="2" placeholder="${ph}"></textarea>`
+                : `<input type="text" id="ap-t-${c.key}" data-text="${c.key}" placeholder="${ph}">`
+            return `<div class="dash-form-row"><label for="ap-t-${c.key}">${escAttr(c.label)}</label>${control}</div>`
+        }).join('')
+        return `<div class="ap-text-group">${escAttr(g.titulo)}</div>${campos}`
+    }).join('')
+}
+
 // ---- Estado <-> formulario ----
 function setColores(colores) {
     COLOR_ORDER.forEach(key => {
@@ -122,6 +140,24 @@ function readFuentes() {
         texto: document.getElementById('ap-font-texto').value,
         acento: document.getElementById('ap-font-acento').value
     }
+}
+
+function setTextos(textos) {
+    const t = textos || {}
+    TEXT_GROUPS.forEach(g => g.campos.forEach(c => {
+        const el = document.getElementById('ap-t-' + c.key)
+        if (el) el.value = t[c.key] || ''
+    }))
+}
+
+function readTextos() {
+    const out = {}
+    TEXT_GROUPS.forEach(g => g.campos.forEach(c => {
+        const el = document.getElementById('ap-t-' + c.key)
+        const val = el ? el.value.trim() : ''
+        if (val) out[c.key] = val   // vacío => se omite => el sitio usa el default
+    }))
+    return out
 }
 
 function markActivePreset(id) {
@@ -160,9 +196,11 @@ function updatePreview() {
     buildPresets()
     buildColorPickers()
     buildFontSelects()
+    buildTextos()
 
     setColores(tema.colores || DEFAULT_COLORES)
     setFuentes(tema.fuentes)
+    setTextos(tema.textos)
     if (tema.preset && findPreset(tema.preset)) markActivePreset(tema.preset)
     updatePreview()
 
@@ -177,7 +215,8 @@ function updatePreview() {
             ...tema,
             preset: activePreset ? activePreset.dataset.preset : 'custom',
             colores: readColores(),
-            fuentes: readFuentes()
+            fuentes: readFuentes(),
+            textos: readTextos()
         }
 
         const actualizado = await actualizarNegocio(negocio.id, { tema: nuevoTema })

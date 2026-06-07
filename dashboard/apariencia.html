@@ -10,6 +10,9 @@
         .ap-hint { font-size: 13px; color: var(--color-desc); margin: -4px 0 16px; }
         .ap-card { max-width: none; margin-bottom: 20px; }
         .ap-card-title { font-size: 1.05rem; margin: 0 0 4px; color: var(--color-text); }
+        .ap-text-group { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--color-primary); margin: 18px 0 10px; padding-bottom: 5px; border-bottom: 1px solid #eee; }
+        .ap-text-group:first-child { margin-top: 4px; }
+        .ap-textos textarea { min-height: 64px; resize: vertical; }
 
         .ap-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
         @media (max-width: 920px) { .ap-layout { grid-template-columns: 1fr; } }
@@ -84,6 +87,12 @@
                                 <label for="ap-font-acento">Fuente del subtítulo manuscrito</label>
                                 <select id="ap-font-acento"></select>
                             </div>
+                        </div>
+
+                        <div class="dash-form-card ap-card">
+                            <h3 class="ap-card-title">Textos</h3>
+                            <p class="ap-hint">Dejá un campo vacío para mantener el texto actual (lo ves en gris como ejemplo).</p>
+                            <div id="ap-textos"></div>
                         </div>
 
                         <p class="dash-feedback" id="ap-feedback" hidden></p>
