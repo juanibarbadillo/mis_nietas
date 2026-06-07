@@ -128,6 +128,32 @@ export const TEXT_GROUPS = [
             { key: 'nosotros_p2', label: 'Párrafo 2', textarea: true, placeholder: 'Desde Atuel Norte, San Rafael (Mendoza), llevamos el verdadero sabor casero a tu mesa.' },
             { key: 'nosotros_btn', label: 'Texto del botón', placeholder: 'Ver el catálogo' }
         ]
+    },
+    {
+        titulo: 'Horarios y contacto',
+        campos: [
+            { key: 'horarios_dias', label: 'Días de atención', placeholder: 'Lunes a sábado' },
+            { key: 'horarios_horas', label: 'Horario', placeholder: '9 a 13 hs · 17 a 21 hs' },
+            { key: 'horarios_nota', label: 'Nota de horarios', placeholder: 'Pedidos por WhatsApp todos los días.' },
+            { key: 'direccion_l1', label: 'Dirección · línea 1', placeholder: 'Atuel Norte' },
+            { key: 'direccion_l2', label: 'Dirección · línea 2', placeholder: 'San Rafael, Mendoza' },
+            { key: 'maps_url', label: 'Link a Google Maps', placeholder: 'https://www.google.com/maps/...' },
+            { key: 'instagram_handle', label: 'Usuario de Instagram', placeholder: '@regionales.misnietas' },
+            { key: 'instagram_url', label: 'Link de Instagram', placeholder: 'https://instagram.com/regionales.misnietas' }
+        ]
+    },
+    {
+        titulo: 'Pie de página',
+        campos: [
+            { key: 'footer_desc', label: 'Descripción del pie', textarea: true, placeholder: 'Productos regionales de elaboración propia. Atuel Norte · San Rafael · Mendoza' }
+        ]
+    },
+    {
+        titulo: 'SEO (Google y redes)',
+        campos: [
+            { key: 'seo_title', label: 'Título para la pestaña / Google', placeholder: 'Regionales Mis Nietas — Productos regionales en San Rafael' },
+            { key: 'seo_description', label: 'Descripción para Google y redes', textarea: true, placeholder: 'Productos regionales de elaboración propia en San Rafael, Mendoza: dulces, vinos caseros, aceite de oliva, conservas y más. Pedí online por WhatsApp.' }
+        ]
     }
 ]
 

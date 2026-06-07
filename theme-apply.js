@@ -37,17 +37,54 @@ function applyFuentes(fuentes) {
     if (acc) { injectGoogleFont(acc.google); root.style.setProperty('--font-acento', acc.stack) }
 }
 
-// Rellena elementos marcados con data-tema="clave" usando tema.textos[clave].
+// Rellena el contenido del sitio desde tema.textos (claves planas).
+//   data-tema="k"        -> textContent
+//   data-tema-html="k"   -> innerHTML
+//   data-tema-href="k"   -> href (links: instagram, maps)
+//   data-tema-src="k"    -> src (imágenes)
 // Forward-compatible: si el HTML aún no tiene esos atributos, no hace nada.
 function applyTextos(textos) {
     if (!textos || typeof textos !== 'object') return
+    const val = key => {
+        const v = textos[key]
+        return (v == null || v === '') ? null : String(v)
+    }
     document.querySelectorAll('[data-tema]').forEach(el => {
-        const key = el.getAttribute('data-tema')
-        const val = textos[key]
-        if (val == null || val === '') return
-        if (el.hasAttribute('data-tema-html')) el.innerHTML = String(val)
-        else el.textContent = String(val)
+        const v = val(el.getAttribute('data-tema'))
+        if (v != null) el.textContent = v
     })
+    document.querySelectorAll('[data-tema-html]').forEach(el => {
+        const v = val(el.getAttribute('data-tema-html'))
+        if (v != null) el.innerHTML = v
+    })
+    document.querySelectorAll('[data-tema-href]').forEach(el => {
+        const v = val(el.getAttribute('data-tema-href'))
+        if (v != null) el.setAttribute('href', v)
+    })
+    document.querySelectorAll('[data-tema-src]').forEach(el => {
+        const v = val(el.getAttribute('data-tema-src'))
+        if (v != null) el.setAttribute('src', v)
+    })
+}
+
+// SEO: solo en la home (donde existe el hero), para no pisar el título
+// funcional de la página de pedido.
+function applySeo(textos) {
+    if (!textos || typeof textos !== 'object') return
+    if (!document.getElementById('hero')) return
+    const setMeta = (selector, value) => {
+        if (!value) return
+        const el = document.querySelector(selector)
+        if (el) el.setAttribute('content', value)
+    }
+    if (textos.seo_title) {
+        document.title = textos.seo_title
+        setMeta('meta[property="og:title"]', textos.seo_title)
+    }
+    if (textos.seo_description) {
+        setMeta('meta[name="description"]', textos.seo_description)
+        setMeta('meta[property="og:description"]', textos.seo_description)
+    }
 }
 
 export function applyTema(tema) {
@@ -55,5 +92,5 @@ export function applyTema(tema) {
     applyColores(tema.colores)
     applyFuentes(tema.fuentes)
     applyTextos(tema.textos)
-    // (Fases siguientes) imágenes y SEO
+    applySeo(tema.textos)
 }
