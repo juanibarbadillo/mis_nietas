@@ -154,6 +154,12 @@ export const TEXT_GROUPS = [
             { key: 'seo_title', label: 'Título para la pestaña / Google', placeholder: 'Regionales Mis Nietas — Productos regionales en San Rafael' },
             { key: 'seo_description', label: 'Descripción para Google y redes', textarea: true, placeholder: 'Productos regionales de elaboración propia en San Rafael, Mendoza: dulces, vinos caseros, aceite de oliva, conservas y más. Pedí online por WhatsApp.' }
         ]
+    },
+    {
+        titulo: 'Envío fuera de zona',
+        campos: [
+            { key: 'envio_fuera_zona_msg', label: 'Aviso cuando la dirección está fuera de zona', textarea: true, placeholder: 'Tu dirección está fuera de la zona con envío fijo. El costo del envío lo coordinamos por WhatsApp al confirmar tu pedido.' }
+        ]
     }
 ]
 

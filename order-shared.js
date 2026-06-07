@@ -222,7 +222,11 @@ export function construirMensajeWhatsApp(params) {
     lineas.push('')
 
     if (entrega.indexOf('domicilio') !== -1) {
-        lineas.push('Envío (' + (zonaNombre ? zonaNombre : 'Sin categoría') + '): $' + costoEnvio)
+        if (params.envioACoordinar) {
+            lineas.push('Envío: a coordinar con el vendedor (dirección fuera de zona)')
+        } else {
+            lineas.push('Envío (' + (zonaNombre ? zonaNombre : 'Sin categoría') + '): $' + costoEnvio)
+        }
     }
     lineas.push('TOTAL: $' + total)
     lineas.push('')

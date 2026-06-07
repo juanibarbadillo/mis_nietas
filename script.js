@@ -635,8 +635,8 @@ function actualizarTotal() {
             host.querySelector('[data-slot="envio"]').textContent = `$${envioDet.envio}`;
             host.querySelector('[data-slot="envio-zona"]').textContent = `(${envioDet.nombre}, ${envioDet.distanceM ? envioDet.distanceM.toFixed(0) + 'm' : ''})`;
         } else {
-            host.querySelector('[data-slot="envio"]').textContent = '—';
-            host.querySelector('[data-slot="envio-zona"]').textContent = '(fuera de zona)';
+            host.querySelector('[data-slot="envio"]').textContent = 'a coordinar';
+            host.querySelector('[data-slot="envio-zona"]').textContent = '(fuera de zona, se coordina por WhatsApp)';
         }
 
         host.querySelector('[data-slot="total"]').textContent = `$${totalFinal}`;
@@ -792,7 +792,9 @@ function setDeliveryMarker(coords, save) {
     if (zoneInfo.coincide) {
         updateDeliveryZoneStatus(`Zona: ${zoneInfo.nombre} · Envío $${zoneInfo.envio}`);
     } else {
-        updateDeliveryZoneStatus('Ubicación fuera de zona de entrega.');
+        var msgFuera = (currentNegocio && currentNegocio.tema && currentNegocio.tema.textos && currentNegocio.tema.textos.envio_fuera_zona_msg)
+            || 'Tu dirección está fuera de la zona con envío fijo. El costo del envío lo coordinamos por WhatsApp al confirmar tu pedido.';
+        updateDeliveryZoneStatus(msgFuera);
     }
     actualizarTotal();
 }
@@ -1207,14 +1209,7 @@ function confirmarPedido() {
             getEl('ubicacion-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return;
         }
-
-        const zonas = obtenerZonasDelivery();
-        const det = calculateDeliveryCompat(zonas);
-        if (!det.coincide) {
-            showError(errAddr, 'La dirección está fuera de las zonas de envío configuradas.');
-            getEl('ubicacion-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return;
-        }
+        // Fuera de zona NO bloquea: el envío se coordina por WhatsApp con el vendedor.
     }
 
     var montoPagaraTxt = '';
@@ -1244,6 +1239,7 @@ function confirmarPedido() {
     let zonaNombre = '';
     let costoEnvio = 0;
     let zonaCoincidio = false;
+    let envioACoordinar = false;
 
     if (entrega === 'A domicilio') {
         ubicacionLink = getLS(LS_DELIVERY_MAPS, '') || '';
@@ -1253,6 +1249,7 @@ function confirmarPedido() {
         zonaCoincidio = det.coincide;
         zonaNombre = det.nombre;
         costoEnvio = det.coincide ? det.envio : 0;
+        envioACoordinar = !det.coincide;   // fuera de zona => costo a coordinar por WhatsApp
     }
 
     const subProd = obtenerSubtotalProductos(pedido);
@@ -1276,6 +1273,7 @@ function confirmarPedido() {
         costoEnvio: entrega === 'A domicilio' && zonaCoincidio ? costoEnvio : 0,
         zonaNombre,
         zonaCoincidio,
+        envioACoordinar,
         total: totalNumerico,
         pago,
         entrega,
