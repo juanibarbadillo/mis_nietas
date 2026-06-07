@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zonas — Regionales Mis Nietas</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- styles.css trae los estilos del admin de zonas leaflet (.zonas-admin-card, .zonas-table, etc).
+         dashboard.css va después y reemplaza body/navbar; las clases prefijadas dash- no chocan. -->
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/dashboard/dashboard.css">
+    <style>
+        /* styles.css fija el body con padding-top: 70px que ya manejamos en dashboard.css.
+           No duplicar. */
+        #zonas-host { margin-top: 8px; }
+        /* El leaflet table del cocina legacy usa h3 con border-bottom verde — adaptar al
+           contexto dashboard manteniendo visual original. */
+        #zonas-host h3 {
+            font-family: 'Julius Sans One', sans-serif;
+            color: var(--color-primary);
+            border-bottom: 3px solid var(--color-secondary);
+            display: inline-block;
+            padding-bottom: 6px;
+            margin-bottom: 14px;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <div id="dash-loading" class="dash-loading">Cargando…</div>
+
+    <div id="dash-main-wrap" style="display:none;">
+        <header id="dash-header-mount"></header>
+        <aside id="dash-drawer-mount"></aside>
+
+        <main class="dash-main">
+            <div class="dash-container">
+                <div class="dash-page-header">
+                    <h2>Zonas de entrega</h2>
+                    <span class="dash-meta">Definí círculos de cobertura</span>
+                </div>
+
+                <div id="zonas-host"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/pages/dashboard-zonas.js"></script>
+</body>
+</html>

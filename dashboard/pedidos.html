@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos — Regionales Mis Nietas</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/dashboard/dashboard.css">
+</head>
+<body class="dashboard-body">
+    <div id="dash-loading" class="dash-loading">Cargando…</div>
+
+    <div id="dash-main-wrap" style="display:none;">
+        <header id="dash-header-mount"></header>
+        <aside id="dash-drawer-mount"></aside>
+
+        <main class="dash-main">
+            <div class="dash-container">
+                <div class="dash-page-header">
+                    <h2>Pedidos</h2>
+                    <span class="dash-meta" id="pedidos-count">— pedidos</span>
+                </div>
+
+                <div class="dash-toolbar">
+                    <div class="dash-filters" id="filtros">
+                        <button class="dash-filter-btn active" data-filter="activos">Activos</button>
+                        <button class="dash-filter-btn" data-filter="entregados">Entregados</button>
+                        <button class="dash-filter-btn" data-filter="todos">Todos</button>
+                    </div>
+                    <div class="dash-search">
+                        <input type="search" id="search-input" placeholder="Buscar por cliente o teléfono…" autocomplete="off">
+                    </div>
+                </div>
+
+                <div id="lista-pedidos"></div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/pages/dashboard-pedidos.js"></script>
+</body>
+</html>

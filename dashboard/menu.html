@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menú — Regionales Mis Nietas</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/dashboard/dashboard.css">
+    <style>
+        .dash-menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        .dash-menu-card {
+            background: #fff;
+            border: 1px solid rgba(15, 73, 15, 0.08);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            gap: 14px;
+            box-shadow: 0 4px 16px rgba(15, 73, 15, 0.04);
+        }
+        .dash-menu-card img {
+            width: 80px; height: 80px;
+            object-fit: cover;
+            border-radius: 12px;
+            flex-shrink: 0;
+            background: #f5f5f5;
+        }
+        .dash-menu-card-body { flex: 1; min-width: 0; }
+        .dash-menu-card h4 {
+            margin: 0 0 4px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--color-text);
+        }
+        .dash-menu-card-desc {
+            color: var(--color-desc);
+            font-size: 12px;
+            margin: 0 0 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+        .dash-menu-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--color-desc);
+            margin-top: 6px;
+        }
+        .dash-menu-card-meta .price {
+            color: var(--color-primary);
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .dash-menu-card-tags {
+            display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;
+        }
+        .dash-menu-tag {
+            background: rgba(15, 73, 15, 0.1);
+            color: var(--color-primary);
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+        }
+        .dash-menu-tag.tag-extra { background: #fff4cc; color: #7a5a00; }
+        .dash-menu-card-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 6px;
+        }
+        .dash-menu-card-actions button {
+            font-size: 12px;
+            padding: 5px 12px;
+            background: #fff;
+            border: 1.5px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .dash-menu-card-actions button:hover { border-color: var(--color-primary); color: var(--color-primary); }
+        .dash-menu-card-actions .btn-del { color: #c0392b; border-color: rgba(192, 57, 43, 0.3); }
+        .dash-menu-card-actions .btn-del:hover { background: #fdf0ee; color: #c0392b; border-color: #c0392b; }
+
+        /* Modal */
+        .dash-modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1500;
+        }
+        .dash-modal-overlay[hidden] { display: none; }
+        .dash-modal-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 520px;
+            width: 90%;
+            max-height: 92vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .dash-modal-card h3 {
+            margin: 0 0 18px;
+            font-size: 1.4rem;
+            font-family: 'Julius Sans One', sans-serif;
+            color: var(--color-text);
+            font-weight: 700;
+        }
+        .dash-checkbox-row {
+            display: flex; gap: 18px; align-items: center;
+            flex-wrap: wrap;
+        }
+        .dash-checkbox-row label {
+            display: flex; align-items: center; gap: 6px; margin: 0;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .dash-img-picker {
+            display: flex; gap: 14px; align-items: center;
+        }
+        .dash-img-picker img {
+            width: 76px; height: 76px;
+            border-radius: 12px; object-fit: cover; background: #f5f5f5;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <div id="dash-loading" class="dash-loading">Cargando…</div>
+
+    <div id="dash-main-wrap" style="display:none;">
+        <header id="dash-header-mount"></header>
+        <aside id="dash-drawer-mount"></aside>
+
+        <main class="dash-main">
+            <div class="dash-container">
+                <div class="dash-page-header">
+                    <h2>Catálogo</h2>
+                    <button class="dash-btn-primary" id="btn-nuevo">+ Agregar producto</button>
+                </div>
+
+                <p class="dash-feedback" id="feedback" hidden></p>
+
+                <div id="menu-grid" class="dash-menu-grid"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="dash-modal-overlay" id="modal" hidden>
+        <div class="dash-modal-card">
+            <h3 id="modal-title">Producto</h3>
+            <input type="hidden" id="prod-id">
+            <div class="dash-form-row">
+                <label>Nombre *</label>
+                <input type="text" id="prod-nombre" required>
+            </div>
+            <div class="dash-form-row">
+                <label>Descripción</label>
+                <textarea id="prod-desc" rows="2"></textarea>
+            </div>
+            <div class="dash-form-row" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px;">
+                <div>
+                    <label>Precio *</label>
+                    <input type="number" id="prod-precio" min="0" step="50" required>
+                </div>
+                <div>
+                    <label>Categoría</label>
+                    <select id="prod-categoria">
+                        <option>Dulces y Mermeladas</option>
+                        <option>Dulce de Leche</option>
+                        <option>Conservas</option>
+                        <option>Aceite de Oliva</option>
+                        <option>Vinos</option>
+                        <option>Cerveza Artesanal</option>
+                        <option>Frutos Secos</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Orden</label>
+                    <input type="number" id="prod-orden" min="1" step="1" value="1">
+                </div>
+            </div>
+            <div class="dash-form-row">
+                <label>Imagen</label>
+                <div class="dash-img-picker">
+                    <img id="prod-imagen-preview" src="/static/producto.jpeg" alt="">
+                    <label class="dash-btn-secondary" style="cursor:pointer;">
+                        Cambiar
+                        <input type="file" id="prod-imagen-file" accept="image/*" hidden>
+                    </label>
+                </div>
+            </div>
+            <div class="dash-form-row dash-checkbox-row">
+                <label><input type="checkbox" id="prod-veggi"> Veggie</label>
+                <label><input type="checkbox" id="prod-glutenfree"> Gluten free</label>
+            </div>
+            <div class="dash-form-row dash-checkbox-row">
+                <label><input type="checkbox" id="prod-es-extra"> Es extra (no aparece en el catálogo público)</label>
+            </div>
+            <p class="dash-feedback" id="modal-feedback" hidden></p>
+            <div class="dash-form-actions">
+                <button class="dash-btn-primary" id="modal-save">Guardar</button>
+                <button class="dash-btn-secondary" id="modal-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/pages/dashboard-menu.js"></script>
+</body>
+</html>

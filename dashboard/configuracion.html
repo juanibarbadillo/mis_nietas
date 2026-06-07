@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración — Regionales Mis Nietas</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/dashboard/dashboard.css">
+    <style>
+        .input-help {
+            font-size: 12px;
+            color: var(--color-desc);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body class="dashboard-body">
+    <div id="dash-loading" class="dash-loading">Cargando…</div>
+
+    <div id="dash-main-wrap" style="display:none;">
+        <header id="dash-header-mount"></header>
+        <aside id="dash-drawer-mount"></aside>
+
+        <main class="dash-main">
+            <div class="dash-container">
+                <div class="dash-page-header">
+                    <h2>Configuración</h2>
+                    <span class="dash-meta">Datos del negocio</span>
+                </div>
+
+                <div class="dash-form-card">
+                    <div class="dash-form-row">
+                        <label>Slug (URL pública)</label>
+                        <input type="text" id="cfg-slug" disabled>
+                        <p class="input-help">
+                            El slug no se puede cambiar desde acá. Si necesitás renombrarlo, pedir cambio manual.
+                        </p>
+                    </div>
+                    <div class="dash-form-row">
+                        <label>Nombre del negocio *</label>
+                        <input type="text" id="cfg-nombre" required>
+                    </div>
+                    <div class="dash-form-row">
+                        <label>Teléfono (WhatsApp del negocio)</label>
+                        <input type="tel" id="cfg-telefono" placeholder="54260...">
+                        <p class="input-help">
+                            Sin espacios ni +. Ej: 542604539727. Es el número que recibe los pedidos por WhatsApp.
+                        </p>
+                    </div>
+
+
+                    <p class="dash-feedback" id="cfg-feedback" hidden></p>
+
+                    <div class="dash-form-actions">
+                        <button class="dash-btn-primary" id="cfg-save">Guardar cambios</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/pages/dashboard-configuracion.js"></script>
+</body>
+</html>

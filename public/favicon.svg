@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Regionales Mis Nietas">
+  <rect width="64" height="64" rx="14" fill="#5a3823"/>
+  <!-- tapa -->
+  <rect x="24" y="9" width="16" height="5" rx="2" fill="#caa14a"/>
+  <rect x="22" y="13" width="20" height="7" rx="2.5" fill="#b07a2e"/>
+  <!-- frasco -->
+  <rect x="20" y="19" width="24" height="34" rx="7" fill="#f1e2c4" stroke="#caa14a" stroke-width="2"/>
+  <!-- conserva / dulce -->
+  <rect x="23" y="29" width="18" height="21" rx="5" fill="#a23b2d"/>
+  <!-- etiqueta -->
+  <rect x="24.5" y="34.5" width="15" height="10" rx="2" fill="#fbf7ef"/>
+  <text x="32" y="42.2" font-family="Georgia, 'Times New Roman', serif" font-size="7.5" font-weight="700" fill="#5a3823" text-anchor="middle">MN</text>
+</svg>

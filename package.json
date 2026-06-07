@@ -1,0 +1,23 @@
+{
+  "name": "regionales-mis-nietas",
+  "version": "1.0.0",
+  "description": "Tienda online de productos regionales artesanales — Regionales Mis Nietas (San Rafael, Mendoza)",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^8.0.14"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.106.2",
+    "leaflet": "^1.9.4"
+  }
+}

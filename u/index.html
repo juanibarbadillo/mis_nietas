@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regionales Mis Nietas — Productos regionales en San Rafael</title>
+    <meta name="description" content="Productos regionales de elaboración propia en San Rafael, Mendoza: dulce de leche y mermeladas artesanales, vinos caseros, aceite de oliva, conservas y frutos secos. Pedí online por WhatsApp.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css?v=20260515c">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="container">
+            <div class="logo">
+                <a href="/u/index.html">Mis Nietas</a>
+            </div>
+            <nav class="nav-desktop">
+                <a href="#menu">Catálogo</a>
+                <a href="/u/pedido.html">Mi Pedido</a>
+            </nav>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Mobile -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-overlay" onclick="toggleMenu()"></div>
+        <div class="sidebar-content">
+            <button type="button" class="sidebar-close" onclick="toggleMenu()" aria-label="Cerrar menú">&times;</button>
+            <a href="/u/index.html">Inicio</a>
+            <a href="#menu" onclick="toggleMenu()">Catálogo</a>
+            <a href="/u/pedido.html" onclick="toggleMenu()">Mi Pedido</a>
+            <a href="#horarios" onclick="toggleMenu()">Horarios</a>
+        </div>
+    </div>
+
+    <!-- Botón flotante WhatsApp (el href real se completa con el teléfono del negocio en JS) -->
+    <a href="#" id="wa-float" class="whatsapp-float" target="_blank" aria-label="Contactar por WhatsApp" hidden>
+        <img src="https://img.icons8.com/color/48/000000/whatsapp.png" alt="WhatsApp">
+    </a>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 id="negocio-nombre">Regionales Mis Nietas</h1>
+            <p class="subtitle">Productos regionales · elaboración propia</p>
+            <!--<a href="#menu" class="btn-primary">COMENZAR PEDIDO</a>-->
+        </div>
+    </section>
+
+    <!-- Menú Section -->
+    <section id="menu" class="menu">
+        <div class="container">
+            <!--h2>Menú</h2-->
+            <div id="menu-dynamic"></div>
+        </div>
+    </section>
+
+    <!-- Horarios Section -->
+    <section id="horarios" class="horarios">
+        <div class="container">
+            <h2>Horarios</h2>
+            <div class="product-card">
+                <div class="product-info">
+                    <p class= "horario"><strong>Lunes a sábado de <br>9 a 13 hs y de 17 a 21 hs</strong></p>
+                    <p>Para hacer pedidos estamos disponibles todos los días por WhatsApp.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>Instagram: <a href="https://instagram.com/regionales.misnietas" target="_blank">@regionales.misnietas</a></p>
+            <p>Ubicación: Atuel Norte, San Rafael, Mendoza</p>
+            <p id="footer-tel">Telefono: —</p>
+        </div>
+    </footer>
+
+    <!-- Barra Sticky Inferior -->
+    <div class="sticky-bar" id="sticky-bar">
+        <div class="sticky-info">
+            <div class="sticky-qty">
+                <div class="sticky-qty-num" id="sticky-qty-num">0</div>
+                <div class="sticky-qty-label">productos</div>
+            </div>
+            <div class="sticky-divider"></div>
+            <div class="sticky-total">
+                <div class="sticky-total-amount" id="sticky-total">$0</div>
+                <div class="sticky-total-label">total</div>
+            </div>
+        </div>
+        <a href="/u/pedido.html" class="btn-sticky">Ver mi pedido</a>
+    </div>
+
+    <script type="module" src="/src/pages/u-index.js"></script>
+</body>
+</html>

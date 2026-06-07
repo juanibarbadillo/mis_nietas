@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Regionales Mis Nietas</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/dashboard/dashboard.css">
+</head>
+<body class="dashboard-body">
+    <div id="dash-loading" class="dash-loading">Cargando dashboard…</div>
+
+    <div id="dash-main-wrap" style="display:none;">
+        <header id="dash-header-mount"></header>
+        <aside id="dash-drawer-mount"></aside>
+
+        <main class="dash-main">
+            <div class="dash-container">
+                <div class="dash-page-header">
+                    <h2>Bienvenida</h2>
+                    <span class="dash-meta" id="dash-fecha">—</span>
+                </div>
+
+                <div id="dash-error-container"></div>
+
+                <div class="dash-grid">
+                    <div class="dash-card">
+                        <h3>Negocio</h3>
+                        <div class="dash-card-row">
+                            <span>Nombre</span><strong id="negocio-nombre">—</strong>
+                        </div>
+                        <div class="dash-card-row">
+                            <span>Slug</span><strong id="negocio-slug">—</strong>
+                        </div>
+                        <div class="dash-card-row">
+                            <span>Teléfono</span><strong id="negocio-telefono">—</strong>
+                        </div>
+                    </div>
+
+                    <div class="dash-card">
+                        <h3>Links rápidos</h3>
+                        <div class="dash-card-row">
+                            <span>Catálogo público</span>
+                            <a id="link-catalogo" href="#" target="_blank">abrir →</a>
+                        </div>
+                        <div class="dash-card-row">
+                            <span>Ver pedidos</span>
+                            <a href="/dashboard/pedidos.html">abrir →</a>
+                        </div>
+                        <div class="dash-card-row">
+                            <span>Editar catálogo</span>
+                            <a href="/dashboard/menu.html">abrir →</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="/src/pages/dashboard-index.js"></script>
+</body>
+</html>

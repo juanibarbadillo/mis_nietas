@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresar — Regionales Mis Nietas</title>
+    <meta name="description" content="Panel de administración Regionales Mis Nietas">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        body {
+            background: var(--color-secondary);
+            padding-top: 0; /* override del padding-top de styles.css */
+        }
+        .auth-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            box-sizing: border-box;
+        }
+        .auth-card {
+            max-width: 420px;
+            width: 100%;
+            background: #fff;
+            border-radius: 8px;
+            padding: 36px 32px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+        }
+        .auth-card h1 {
+            margin: 0 0 4px;
+            font-size: clamp(2.2rem, 9vw, 3rem);
+            text-align: center;
+            font-family: 'Bristol', serif;
+            font-weight: 700;
+            color: var(--color-text);
+            letter-spacing: -1px;
+            white-space: nowrap;
+        }
+        .auth-card .auth-subtitle {
+            text-align: center;
+            margin: 0 0 28px;
+            color: var(--color-desc);
+            font-size: 1.2rem;
+            font-family: 'MoreSugar', cursive;
+        }
+        .auth-form .form-row { margin-bottom: 16px; }
+        .auth-form label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            color: #555;
+            font-weight: 500;
+        }
+        .auth-form input[type="email"],
+        .auth-form input[type="password"] {
+            width: 100%;
+            padding: 11px 13px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: border-color 0.15s;
+        }
+        .auth-form input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        .auth-submit {
+            width: 100%;
+            padding: 12px;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .auth-submit:hover:not(:disabled) { background: var(--color-primary-dark); }
+        .auth-submit:disabled {
+            background: #c0c0c0;
+            cursor: not-allowed;
+        }
+        .auth-error {
+            color: var(--color-primary);
+            font-size: 13px;
+            margin-top: 12px;
+            text-align: center;
+            display: none;
+            background: #fdf0ee;
+            padding: 8px 12px;
+            border-radius: 4px;
+        }
+        .auth-success {
+            text-align: center;
+        }
+        .auth-success .check {
+            font-size: 48px;
+            color: #2ecc71;
+            margin-bottom: 8px;
+        }
+        .auth-success h2 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+        .auth-success p {
+            color: #666;
+            font-size: 14px;
+            margin: 0 0 20px;
+        }
+        .auth-logout {
+            width: 100%;
+            padding: 10px;
+            background: #fff;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .auth-logout:hover { background: #fdf0ee; }
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+        .auth-footer a {
+            color: #888;
+            text-decoration: none;
+        }
+        .auth-footer a:hover { color: var(--color-primary); }
+        .auth-loading {
+            text-align: center;
+            color: #999;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <h1>Regionales Mis Nietas</h1>
+            <p class="auth-subtitle">Panel de administración</p>
+
+            <!-- Estado: loading inicial -->
+            <div id="loading-state" class="auth-loading">Cargando…</div>
+
+            <!-- Estado: form de login (no logueado) -->
+            <form class="auth-form" id="login-form" style="display:none;" autocomplete="on">
+                <div class="form-row">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required autocomplete="email" autofocus>
+                </div>
+                <div class="form-row">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="auth-submit" id="submit-btn">Ingresar</button>
+                <p class="auth-error" id="error-msg"></p>
+            </form>
+
+            <!-- Estado: logueado -->
+            <div id="logged-state" class="auth-success" style="display:none;">
+                <div class="check">✓</div>
+                <h2>Sesión iniciada</h2>
+                <p id="logged-email" class="muted"></p>
+                <a href="/dashboard/index.html" class="auth-submit" style="display:inline-block; text-decoration:none; box-sizing:border-box; margin-bottom:10px;">Ir al panel</a>
+                <button type="button" class="auth-logout" id="logout-btn">Cerrar sesión</button>
+            </div>
+
+            <p class="auth-footer">
+                <a href="/u/index.html">← Volver al sitio</a>
+            </p>
+        </div>
+    </div>
+
+    <script type="module" src="/src/pages/login.js"></script>
+</body>
+</html>
