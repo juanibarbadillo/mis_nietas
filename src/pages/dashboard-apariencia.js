@@ -247,10 +247,6 @@ function buildWaSection() {
         textarea.value = DEFAULT_WA_TEMPLATE
         textarea.focus()
     })
-    document.getElementById('ap-wa-clear').addEventListener('click', () => {
-        textarea.value = ''
-        textarea.focus()
-    })
 }
 
 function setTextos(textos) {
@@ -315,7 +311,9 @@ function updatePreview() {
     setColores(tema.colores || DEFAULT_COLORES)
     setFuentes(tema.fuentes)
     setTextos(tema.textos)
-    document.getElementById('ap-wa-template').value = (typeof tema.mensaje_wa === 'string') ? tema.mensaje_wa : ''
+    // Mostrar el mensaje actual ya cargado para editarlo (custom guardado, o el por defecto).
+    document.getElementById('ap-wa-template').value =
+        (typeof tema.mensaje_wa === 'string' && tema.mensaje_wa.trim()) ? tema.mensaje_wa : DEFAULT_WA_TEMPLATE
     if (tema.preset && findPreset(tema.preset)) markActivePreset(tema.preset)
     updatePreview()
 
@@ -326,7 +324,10 @@ function updatePreview() {
 
         const activePreset = document.querySelector('.ap-preset.active')
         // Merge: preservamos otras claves del tema (textos, contacto, imagenes, seo)
-        const waVal = (document.getElementById('ap-wa-template').value || '').trim()
+        // Si quedó igual al default, guardamos vacío (sigue usando la versión "viva"
+        // del default); si lo editaron, guardamos su mensaje personalizado.
+        const waRaw = (document.getElementById('ap-wa-template').value || '').trim()
+        const waVal = (waRaw === DEFAULT_WA_TEMPLATE.trim()) ? '' : waRaw
         const nuevoTema = {
             ...tema,
             preset: activePreset ? activePreset.dataset.preset : 'custom',
