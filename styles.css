@@ -2830,4 +2830,10 @@ body.no-scroll {
     .hero { min-height: 66vh; padding: 84px 18px 56px; background-position: center 40%; }
 }
 
+/* ---- Logo (imagen) ---- */
+.main-header { background-color: #ffffff; }
+.logo a { display: flex; align-items: center; }
+.logo-img { height: 50px; width: auto; display: block; }
+@media (max-width: 600px) { .logo-img { height: 40px; } }
+
 
