@@ -1333,7 +1333,8 @@ function confirmarPedido() {
                 ...pedidoCompleto,
                 fecha: pedidoGuardado.fecha,
                 totalFinal: totalNumerico,
-                linkPedido
+                linkPedido,
+                template: currentNegocio?.tema?.mensaje_wa
             });
 
             // ===== ABRIR WHATSAPP =====

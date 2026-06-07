@@ -1,6 +1,29 @@
 import { productosCache } from './menu-store.js'
+import { DEFAULT_WA_TEMPLATE } from './theme-config.js'
 
 export var umasushiZonasCache = []
+
+// Rinde una plantilla de mensaje reemplazando {etiquetas} por sus valores.
+// Si TODAS las etiquetas de una línea quedan vacías, se omite la línea entera
+// (ej.: "📍 {direccion}" en retiro). Etiquetas desconocidas se dejan como están.
+function renderPlantillaMensaje(tpl, tokens) {
+    var lines = String(tpl).split('\n')
+    var out = []
+    for (var i = 0; i < lines.length; i++) {
+        var line = lines[i]
+        if (!/\{(\w+)\}/.test(line)) { out.push(line); continue }
+        var algunoConValor = false
+        var replaced = line.replace(/\{(\w+)\}/g, function (m, key) {
+            if (!(key in tokens)) { algunoConValor = true; return m }   // etiqueta desconocida: dejar literal
+            var v = tokens[key]
+            if (v !== '' && v != null) algunoConValor = true
+            return v == null ? '' : String(v)
+        })
+        if (!algunoConValor) continue   // toda la línea dependía de etiquetas vacías
+        out.push(replaced)
+    }
+    return out.join('\n').replace(/\n{3,}/g, '\n\n').replace(/^\s+|\s+$/g, '')
+}
 
 export function setUmasushiZonasCache(val) {
     umasushiZonasCache = Array.isArray(val) ? val.slice() : []
@@ -200,65 +223,47 @@ export function construirMensajeWhatsApp(params) {
         return '$' + String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
     }
 
-    var L = []
-    L.push('¡Hola! 👋 Quiero hacer este pedido 🫙')
-    L.push('')
-    L.push('👤 *' + nombre + '*')
-    if (telefono) L.push('📱 ' + telefono)
-    L.push('')
-
-    L.push('🛒 *Mi pedido*')
-    for (var i = 0; i < pedido.length; i++) {
-        var item = pedido[i]
-        L.push('• ' + item.cantidad + '×  ' + item.nombre + '  —  ' + fmt(item.precio * item.cantidad))
-    }
+    // Bloques dinámicos (multilínea)
+    var productosBlock = pedido.map(function (item) {
+        return '• ' + item.cantidad + '×  ' + item.nombre + '  —  ' + fmt(item.precio * item.cantidad)
+    }).join('\n')
 
     var exLines = extrasLineItems(extras)
-    if (exLines.length > 0) {
-        L.push('')
-        L.push('✨ *Extras*')
-        for (var e = 0; e < exLines.length; e++) {
-            var el = exLines[e]
-            var exLabel = (el.label || '').replace(/^Extra\s+/i, '')
-            L.push('• ' + exLabel + '  ×' + el.cantidad + '  —  ' + fmt(el.sub))
-        }
-    }
+    var extrasBlock = exLines.length
+        ? '✨ *Extras*\n' + exLines.map(function (el) {
+            return '• ' + (el.label || '').replace(/^Extra\s+/i, '') + '  ×' + el.cantidad + '  —  ' + fmt(el.sub)
+        }).join('\n')
+        : ''
 
-    L.push('')
-    L.push('━━━━━━━━━━━━━')
-    L.push('Subtotal:  ' + fmt(subProd + montoExtras))
+    var envioVal = ''
     if (esDomicilio) {
-        if (params.envioACoordinar) {
-            L.push('🚚 Envío:  a coordinar 📲')
-        } else {
-            L.push('🚚 Envío' + (zonaNombre ? ' (' + zonaNombre + ')' : '') + ':  ' + fmt(costoEnvio))
-        }
-    }
-    L.push('🧾 *TOTAL:  ' + fmt(total) + '*')
-    L.push('━━━━━━━━━━━━━')
-    L.push('')
-
-    L.push('💳 Pago:  ' + pago)
-    if (pago === 'Efectivo' && montoPagara != null && String(montoPagara).trim() !== '') {
-        L.push('      Paga con:  ' + fmt(String(montoPagara).replace(/[^\d]/g, '')))
-    }
-    L.push('📦 Entrega:  ' + entrega)
-    if (esDomicilio) {
-        L.push('📍 ' + (ubicacionTxt || 'Dirección a confirmar'))
-        if (ubicacionLink && ubicacionLink !== 'No especificada') L.push('🗺️ ' + ubicacionLink)
+        envioVal = params.envioACoordinar
+            ? 'a coordinar 📲'
+            : fmt(costoEnvio) + (zonaNombre ? '  (' + zonaNombre + ')' : '')
     }
 
-    if (params.indicaciones_cliente && params.indicaciones_cliente.trim() !== '') {
-        L.push('')
-        L.push('📝 *Indicaciones:*  ' + params.indicaciones_cliente.trim())
+    var pagaCon = (pago === 'Efectivo' && montoPagara != null && String(montoPagara).trim() !== '')
+        ? fmt(String(montoPagara).replace(/[^\d]/g, ''))
+        : ''
+
+    var tokens = {
+        nombre: nombre,
+        telefono: telefono,
+        productos: productosBlock,
+        extras: extrasBlock,
+        subtotal: fmt(subProd + montoExtras),
+        envio: envioVal,
+        total: fmt(total),
+        pago: pago,
+        paga_con: pagaCon,
+        entrega: entrega,
+        direccion: esDomicilio ? (ubicacionTxt || '') : '',
+        mapa: (esDomicilio && ubicacionLink && ubicacionLink !== 'No especificada') ? ubicacionLink : '',
+        indicaciones: (params.indicaciones_cliente || '').trim(),
+        fecha: (fechaHora && fechaHora !== '—') ? fechaHora : '',
+        link: params.linkPedido || ''
     }
 
-    L.push('')
-    if (fechaHora && fechaHora !== '—') L.push('🕒 ' + fechaHora)
-    if (params.linkPedido) {
-        L.push('🔗 Ver detalle del pedido:')
-        L.push(params.linkPedido)
-    }
-
-    return L.join('\n')
+    var tpl = (params.template && String(params.template).trim()) ? String(params.template) : DEFAULT_WA_TEMPLATE
+    return renderPlantillaMensaje(tpl, tokens)
 }

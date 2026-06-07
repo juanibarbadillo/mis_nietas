@@ -1,7 +1,7 @@
 import { bootstrapDashPage, mountDashShell } from '../../shared/dashboard-shell.js'
 import { actualizarNegocio } from '../../services/negocios.service.js'
 import { subirImagenBranding } from '../../services/storage.service.js'
-import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, TEXT_GROUPS, IMAGE_FIELDS, findById, findPreset } from '../../theme-config.js'
+import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, TEXT_GROUPS, IMAGE_FIELDS, DEFAULT_WA_TEMPLATE, WA_TOKENS, findById, findPreset } from '../../theme-config.js'
 
 // Estado de las imágenes (clave -> URL). Se inicializa desde tema.imagenes.
 const imagenesState = {}
@@ -222,6 +222,37 @@ function buildImagenes(negocioId) {
     })
 }
 
+function buildWaSection() {
+    const tokensCont = document.getElementById('ap-wa-tokens')
+    const textarea = document.getElementById('ap-wa-template')
+    if (!tokensCont || !textarea) return
+
+    tokensCont.innerHTML = WA_TOKENS.map(t =>
+        `<button type="button" class="ap-wa-token" data-token="${t.token}" title="${t.desc}">${t.token}</button>`
+    ).join('')
+
+    tokensCont.querySelectorAll('.ap-wa-token').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tk = btn.dataset.token
+            const start = textarea.selectionStart != null ? textarea.selectionStart : textarea.value.length
+            const end = textarea.selectionEnd != null ? textarea.selectionEnd : textarea.value.length
+            textarea.value = textarea.value.slice(0, start) + tk + textarea.value.slice(end)
+            const pos = start + tk.length
+            textarea.focus()
+            textarea.setSelectionRange(pos, pos)
+        })
+    })
+
+    document.getElementById('ap-wa-load-default').addEventListener('click', () => {
+        textarea.value = DEFAULT_WA_TEMPLATE
+        textarea.focus()
+    })
+    document.getElementById('ap-wa-clear').addEventListener('click', () => {
+        textarea.value = ''
+        textarea.focus()
+    })
+}
+
 function setTextos(textos) {
     const t = textos || {}
     TEXT_GROUPS.forEach(g => g.campos.forEach(c => {
@@ -279,10 +310,12 @@ function updatePreview() {
     buildFontSelects()
     buildTextos()
     buildImagenes(negocio.id)
+    buildWaSection()
 
     setColores(tema.colores || DEFAULT_COLORES)
     setFuentes(tema.fuentes)
     setTextos(tema.textos)
+    document.getElementById('ap-wa-template').value = (typeof tema.mensaje_wa === 'string') ? tema.mensaje_wa : ''
     if (tema.preset && findPreset(tema.preset)) markActivePreset(tema.preset)
     updatePreview()
 
@@ -293,13 +326,15 @@ function updatePreview() {
 
         const activePreset = document.querySelector('.ap-preset.active')
         // Merge: preservamos otras claves del tema (textos, contacto, imagenes, seo)
+        const waVal = (document.getElementById('ap-wa-template').value || '').trim()
         const nuevoTema = {
             ...tema,
             preset: activePreset ? activePreset.dataset.preset : 'custom',
             colores: readColores(),
             fuentes: readFuentes(),
             textos: readTextos(),
-            imagenes: { ...imagenesState }
+            imagenes: { ...imagenesState },
+            mensaje_wa: waVal
         }
 
         const actualizado = await actualizarNegocio(negocio.id, { tema: nuevoTema })

@@ -172,6 +172,56 @@ export const IMAGE_FIELDS = [
     { key: 'favicon', label: 'Favicon (ícono de la pestaña)', hint: 'Cuadrado chico. PNG.', def: '/favicon.svg', maxW: 128, maxH: 128, format: 'png' }
 ]
 
+// Plantilla por defecto del mensaje de WhatsApp del pedido. Las {etiquetas}
+// se reemplazan por los datos reales. Una línea cuyas únicas etiquetas quedan
+// vacías (ej. retiro sin dirección) se omite automáticamente.
+export const DEFAULT_WA_TEMPLATE = `¡Hola! 👋 Quiero hacer este pedido 🫙
+
+👤 *{nombre}*
+📱 {telefono}
+
+🛒 *Mi pedido*
+{productos}
+
+{extras}
+
+━━━━━━━━━━━━━
+Subtotal:  {subtotal}
+🚚 Envío:  {envio}
+🧾 *TOTAL:  {total}*
+━━━━━━━━━━━━━
+
+💳 Pago:  {pago}
+      Paga con:  {paga_con}
+📦 Entrega:  {entrega}
+📍 {direccion}
+🗺️ {mapa}
+
+📝 *Indicaciones:*  {indicaciones}
+
+🕒 {fecha}
+🔗 Ver detalle del pedido:
+{link}`
+
+// Etiquetas disponibles para la plantilla (para mostrar/insertar en el panel).
+export const WA_TOKENS = [
+    { token: '{nombre}', desc: 'Nombre del cliente' },
+    { token: '{telefono}', desc: 'Teléfono del cliente' },
+    { token: '{productos}', desc: 'Lista de productos' },
+    { token: '{extras}', desc: 'Lista de extras (si hay)' },
+    { token: '{subtotal}', desc: 'Subtotal' },
+    { token: '{envio}', desc: 'Costo de envío (o “a coordinar”)' },
+    { token: '{total}', desc: 'Total' },
+    { token: '{pago}', desc: 'Forma de pago' },
+    { token: '{paga_con}', desc: 'Con cuánto paga (efectivo)' },
+    { token: '{entrega}', desc: 'Tipo de entrega' },
+    { token: '{direccion}', desc: 'Dirección (domicilio)' },
+    { token: '{mapa}', desc: 'Link de Google Maps' },
+    { token: '{indicaciones}', desc: 'Indicaciones del cliente' },
+    { token: '{fecha}', desc: 'Fecha y hora del pedido' },
+    { token: '{link}', desc: 'Link al detalle del pedido' }
+]
+
 export function findById(list, id) {
     if (!id) return null;
     return list.find(x => x.id === id) || null;

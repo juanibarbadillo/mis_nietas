@@ -27,6 +27,14 @@
         .ap-img-status.ok { color: #1e7e34; }
         .ap-img-status.err { color: #c0392b; }
 
+        /* Mensaje de WhatsApp */
+        .ap-wa-tokens { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+        .ap-wa-token { font-family: monospace; font-size: 11.5px; background: #f3efe7; border: 1px solid #e2dccf; border-radius: 6px; padding: 4px 8px; cursor: pointer; color: var(--color-text); }
+        .ap-wa-token:hover { border-color: var(--color-primary); background: #ece5d8; }
+        .ap-wa-textarea { width: 100%; min-height: 340px; box-sizing: border-box; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px; line-height: 1.55; padding: 12px; border: 1px solid #ddd; border-radius: 8px; resize: vertical; }
+        .ap-wa-textarea:focus { outline: none; border-color: var(--color-primary); }
+        .ap-wa-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 10px; }
+
         .ap-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
         @media (max-width: 920px) { .ap-layout { grid-template-columns: 1fr; } }
 
@@ -112,6 +120,17 @@
                             <h3 class="ap-card-title">Imágenes</h3>
                             <p class="ap-hint">Subí tus fotos. Se ajustan y suben solas; después tocá “Guardar cambios”.</p>
                             <div id="ap-imagenes" class="ap-img-grid"></div>
+                        </div>
+
+                        <div class="dash-form-card ap-card">
+                            <h3 class="ap-card-title">Mensaje de WhatsApp</h3>
+                            <p class="ap-hint">Es el texto que se envía al hacer un pedido. Tocá una etiqueta para insertarla; se reemplaza por el dato real. Si una línea sólo tiene una etiqueta y queda vacía (ej. retiro sin dirección), no se muestra. Dejalo vacío para usar el mensaje por defecto.</p>
+                            <div id="ap-wa-tokens" class="ap-wa-tokens"></div>
+                            <textarea id="ap-wa-template" class="ap-wa-textarea" spellcheck="false" placeholder="Vacío = se usa el mensaje por defecto. Tocá «Cargar plantilla por defecto» para editarla."></textarea>
+                            <div class="ap-wa-actions">
+                                <button type="button" class="dash-btn-secondary" id="ap-wa-load-default">Cargar plantilla por defecto</button>
+                                <button type="button" class="ap-img-remove" id="ap-wa-clear">Vaciar (usar la de por defecto)</button>
+                            </div>
                         </div>
 
                         <p class="dash-feedback" id="ap-feedback" hidden></p>
