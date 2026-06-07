@@ -194,62 +194,71 @@ export function construirMensajeWhatsApp(params) {
     var montoPagara = params.montoPagaraCon
     var total = params.totalFinal
 
-    var lineas = []
-    lineas.push('Hola! Quiero hacer un pedido en Regionales Mis Nietas 🫙')
-    lineas.push('')
-    lineas.push('━━━━━━━━━━━━━━━━━━━━')
-    lineas.push('📋 DETALLE')
-    lineas.push('━━━━━━━━━━━━━━━━━━━━')
-    lineas.push('Nombre: ' + nombre)
-    if (telefono) lineas.push('Teléfono: ' + telefono)
-    lineas.push('')
-    lineas.push('Productos:')
+    var esDomicilio = entrega.indexOf('domicilio') !== -1
+    // Formato de monto con separador de miles (es-AR): 12500 -> $12.500
+    var fmt = function (n) {
+        return '$' + String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+    }
+
+    var L = []
+    L.push('¡Hola! 👋 Quiero hacer este pedido 🫙')
+    L.push('')
+    L.push('👤 *' + nombre + '*')
+    if (telefono) L.push('📱 ' + telefono)
+    L.push('')
+
+    L.push('🛒 *Mi pedido*')
     for (var i = 0; i < pedido.length; i++) {
         var item = pedido[i]
-        lineas.push('- ' + item.cantidad + 'x ' + item.nombre + '  ($' + (item.precio * item.cantidad) + ')')
+        L.push('• ' + item.cantidad + '×  ' + item.nombre + '  —  ' + fmt(item.precio * item.cantidad))
     }
-    lineas.push('')
+
     var exLines = extrasLineItems(extras)
-    lineas.push('Extras:')
-    if (exLines.length === 0) {
-        lineas.push('- (ninguno extra)')
-    } else {
+    if (exLines.length > 0) {
+        L.push('')
+        L.push('✨ *Extras*')
         for (var e = 0; e < exLines.length; e++) {
             var el = exLines[e]
-            lineas.push('- ' + el.label + ' x' + el.cantidad + '  ($' + el.sub + ')')
+            var exLabel = (el.label || '').replace(/^Extra\s+/i, '')
+            L.push('• ' + exLabel + '  ×' + el.cantidad + '  —  ' + fmt(el.sub))
         }
     }
-    lineas.push('')
 
-    if (entrega.indexOf('domicilio') !== -1) {
+    L.push('')
+    L.push('━━━━━━━━━━━━━')
+    L.push('Subtotal:  ' + fmt(subProd + montoExtras))
+    if (esDomicilio) {
         if (params.envioACoordinar) {
-            lineas.push('Envío: a coordinar con el vendedor (dirección fuera de zona)')
+            L.push('🚚 Envío:  a coordinar 📲')
         } else {
-            lineas.push('Envío (' + (zonaNombre ? zonaNombre : 'Sin categoría') + '): $' + costoEnvio)
+            L.push('🚚 Envío' + (zonaNombre ? ' (' + zonaNombre + ')' : '') + ':  ' + fmt(costoEnvio))
         }
     }
-    lineas.push('TOTAL: $' + total)
-    lineas.push('')
-    lineas.push('Forma de pago: ' + pago)
+    L.push('🧾 *TOTAL:  ' + fmt(total) + '*')
+    L.push('━━━━━━━━━━━━━')
+    L.push('')
+
+    L.push('💳 Pago:  ' + pago)
     if (pago === 'Efectivo' && montoPagara != null && String(montoPagara).trim() !== '') {
-        lineas.push('¿Con cuánto pagás?: $' + montoPagara)
+        L.push('      Paga con:  ' + fmt(String(montoPagara).replace(/[^\d]/g, '')))
     }
-    lineas.push('')
-    lineas.push('Entrega: ' + entrega)
-    lineas.push('')
-    lineas.push('Fecha y hora del pedido: ' + fechaHora)
-    if (params.linkPedido) {
-        lineas.push('')
-        lineas.push('🗒️ Ver detalle del pedido:')
-        lineas.push(params.linkPedido)
+    L.push('📦 Entrega:  ' + entrega)
+    if (esDomicilio) {
+        L.push('📍 ' + (ubicacionTxt || 'Dirección a confirmar'))
+        if (ubicacionLink && ubicacionLink !== 'No especificada') L.push('🗺️ ' + ubicacionLink)
     }
-    if (entrega.indexOf('domicilio') !== -1) {
-        lineas.push('Dirección: ' + (ubicacionTxt || '—'))
-        lineas.push('📍 Google Maps: ' + (ubicacionLink || '—'))
-    }
+
     if (params.indicaciones_cliente && params.indicaciones_cliente.trim() !== '') {
-        lineas.push('')
-        lineas.push('📝 Indicaciones: ' + params.indicaciones_cliente)
+        L.push('')
+        L.push('📝 *Indicaciones:*  ' + params.indicaciones_cliente.trim())
     }
-    return lineas.join('\n')
+
+    L.push('')
+    if (fechaHora && fechaHora !== '—') L.push('🕒 ' + fechaHora)
+    if (params.linkPedido) {
+        L.push('🔗 Ver detalle del pedido:')
+        L.push(params.linkPedido)
+    }
+
+    return L.join('\n')
 }
