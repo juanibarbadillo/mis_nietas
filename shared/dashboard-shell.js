@@ -7,7 +7,7 @@ const DASH_NAV_ITEMS = [
     { key: 'pedidos',       label: 'Pedidos',        href: '/dashboard/pedidos.html' },
     { key: 'menu',          label: 'Catálogo',       href: '/dashboard/menu.html' },
     { key: 'zonas',         label: 'Zonas',          href: '/dashboard/zonas.html' },
-    { key: 'apariencia',    label: 'Apariencia',     href: '/dashboard/apariencia.html' },
+    { key: 'apariencia',    label: 'Apariencia',     href: '/dashboard/editor.html' },
     { key: 'configuracion', label: 'Configuración',  href: '/dashboard/configuracion.html' }
 ]
 

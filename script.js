@@ -80,6 +80,17 @@ document.addEventListener('DOMContentLoaded', async function () {
         actualizarStickyBar();
         setupHacerPedidoBtn();
     }
+
+    // Modo edición: cuando la home se carga dentro del editor del dashboard
+    // (iframe con ?editor=1). El código del editor se carga sólo en ese caso.
+    try {
+        if (new URLSearchParams(window.location.search).get('editor') === '1') {
+            const { initEditorBridge } = await import('./editor-bridge.js');
+            initEditorBridge();
+        }
+    } catch (e) {
+        console.error('[editor] No se pudo iniciar el modo edición:', e);
+    }
 });
 
 // "Hacer un pedido" (hero): si el carrito está vacío lleva al catálogo
