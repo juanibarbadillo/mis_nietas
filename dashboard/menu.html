@@ -143,7 +143,10 @@
             <div class="dash-container">
                 <div class="dash-page-header">
                     <h2>Catálogo</h2>
-                    <button class="dash-btn-primary" id="btn-nuevo">+ Agregar producto</button>
+                    <div class="dash-page-header-actions">
+                        <button class="dash-btn-secondary" id="btn-secciones">Gestionar secciones</button>
+                        <button class="dash-btn-primary" id="btn-nuevo">+ Agregar producto</button>
+                    </div>
                 </div>
 
                 <p class="dash-feedback" id="feedback" hidden></p>
@@ -171,16 +174,9 @@
                     <input type="number" id="prod-precio" min="0" step="50" required>
                 </div>
                 <div>
-                    <label>Categoría</label>
-                    <select id="prod-categoria">
-                        <option>Dulces y Mermeladas</option>
-                        <option>Dulce de Leche</option>
-                        <option>Conservas</option>
-                        <option>Aceite de Oliva</option>
-                        <option>Vinos</option>
-                        <option>Cerveza Artesanal</option>
-                        <option>Frutos Secos</option>
-                    </select>
+                    <label>Sección</label>
+                    <select id="prod-categoria"></select>
+                    <button type="button" id="btn-nueva-seccion" class="dash-link-btn">+ Nueva sección</button>
                 </div>
                 <div>
                     <label>Orden</label>
@@ -188,18 +184,10 @@
                 </div>
             </div>
             <div class="dash-form-row">
-                <label>Imagen</label>
-                <div class="dash-img-picker">
-                    <img id="prod-imagen-preview" src="/static/producto.jpeg" alt="">
-                    <label class="dash-btn-secondary" style="cursor:pointer;">
-                        Cambiar
-                        <input type="file" id="prod-imagen-file" accept="image/*" hidden>
-                    </label>
-                </div>
-            </div>
-            <div class="dash-form-row dash-checkbox-row">
-                <label><input type="checkbox" id="prod-veggi"> Veggie</label>
-                <label><input type="checkbox" id="prod-glutenfree"> Gluten free</label>
+                <label>Fotos <span class="dash-hint-inline">(hasta 3 · la 1ª es la principal del catálogo)</span></label>
+                <div class="dash-galeria" id="prod-galeria"></div>
+                <input type="file" id="prod-imagen-file" accept="image/*" hidden>
+                <p class="dash-img-status" id="prod-img-status" hidden></p>
             </div>
             <div class="dash-form-row dash-checkbox-row">
                 <label><input type="checkbox" id="prod-es-extra"> Es extra (no aparece en el catálogo público)</label>
@@ -208,6 +196,23 @@
             <div class="dash-form-actions">
                 <button class="dash-btn-primary" id="modal-save">Guardar</button>
                 <button class="dash-btn-secondary" id="modal-cancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-modal-overlay" id="modal-secciones" hidden>
+        <div class="dash-modal-card">
+            <h3>Secciones del catálogo</h3>
+            <p class="dash-hint">Ordená con las flechas (ese orden se ve en el sitio). Podés renombrar tocando el nombre. Para borrar una sección no debe tener productos.</p>
+            <div id="secciones-lista" class="dash-secciones-lista"></div>
+            <div class="dash-secciones-add">
+                <input type="text" id="nueva-seccion-input" placeholder="Nueva sección (ej. Aceites)">
+                <button type="button" class="dash-btn-secondary" id="nueva-seccion-add">Agregar</button>
+            </div>
+            <p class="dash-feedback" id="secciones-feedback" hidden></p>
+            <div class="dash-form-actions">
+                <button class="dash-btn-primary" id="secciones-save">Guardar secciones</button>
+                <button class="dash-btn-secondary" id="secciones-cancel">Cerrar</button>
             </div>
         </div>
     </div>

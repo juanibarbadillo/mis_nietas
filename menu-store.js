@@ -2,7 +2,6 @@ import { obtenerProductos, guardarProducto, eliminarProductoDeSupabase } from '.
 import { isSupabaseReady } from './services/supabase.js'
 import placeholderImg from '/static/producto.jpeg'
 
-var UMASUSHI_MENU_CATEGORIAS = ['Dulces y Mermeladas', 'Dulce de Leche', 'Conservas', 'Aceite de Oliva', 'Vinos', 'Cerveza Artesanal', 'Frutos Secos']
 var CACHE_KEY = 'misnietas_productos_cache'
 var CACHE_TTL_MS = 10 * 60 * 1000
 
@@ -61,9 +60,10 @@ function umasushiSafeText(s) {
 }
 
 function umasushiNormalizeCategory(cat) {
+    // Las secciones las administra el negocio desde el dashboard; no hay lista
+    // blanca: respetamos el nombre cargado (o 'Productos' si viene vacío).
     var c = umasushiSafeText(cat)
-    if (UMASUSHI_MENU_CATEGORIAS.indexOf(c) !== -1) return c
-    return 'Productos'
+    return c || 'Productos'
 }
 
 function removeLegacyMenuStorageKeys() {
@@ -103,7 +103,10 @@ function normalizeMenuItem(raw) {
     var descripcion = umasushiSafeText(raw && (raw.descripcion != null ? raw.descripcion : raw.desc))
     var precio = umasushiClampInt(raw && raw.precio, 0)
     var categoria = umasushiNormalizeCategory(raw && raw.categoria)
-    var imagen = umasushiSafeText(raw && raw.imagen) || placeholderImg
+    var imagenes = Array.isArray(raw && raw.imagenes)
+        ? raw.imagenes.map(umasushiSafeText).filter(Boolean)
+        : []
+    var imagen = umasushiSafeText(raw && raw.imagen) || imagenes[0] || placeholderImg
     var id = umasushiSafeText(raw && raw.id) || umasushiUid('p')
     var orden = umasushiClampInt(raw && raw.orden, 0)
 
@@ -115,13 +118,11 @@ function normalizeMenuItem(raw) {
         descripcion: descripcion,
         precio: precio,
         imagen: imagen,
+        imagenes: imagenes,
         categoria: categoria,
         orden: orden,
         es_extra: esExtra,
-        tags: {
-            veggi: !!tags.veggi,
-            glutenfree: tags.glutenfree == null ? true : !!tags.glutenfree
-        }
+        tags: tags
     }
 }
 
@@ -133,6 +134,7 @@ function productoToSupabaseRow(item) {
         precio: item.precio,
         categoria: item.categoria,
         imagen: item.imagen,
+        imagenes: Array.isArray(item.imagenes) ? item.imagenes : [],
         orden: item.orden != null ? item.orden : 0,
         activo: true,
         es_extra: !!item.es_extra

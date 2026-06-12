@@ -7,9 +7,7 @@ import { setProductosCache, obtenerMenu, loadMenu, initializeMenu, obtenerExtras
 import { setUmasushiZonasCache, obtenerZonasDelivery, obtenerExtrasStored, calcularExtrasMonto, obtenerSubtotalProductos, obtenerTotalPedidoNumerico, extrasLineItems, construirMensajeWhatsApp } from './order-shared.js'
 import { calculateDelivery } from './delivery-calc.js'
 import { applyTema } from './theme-apply.js'
-import { searchAddressCoordinates, reverseGeocodeCoords, initLeafletMap, createLeafletCircle } from './maps-osm.js'
-import glutenfreeImg from '/static/glutenfree.png'
-import veggiImg from '/static/veggi.png'
+import { searchAddressCoordinates, reverseGeocodeCoords, initLeafletMap, createLeafletCircle, initNominatimAutocomplete } from './maps-osm.js'
 import placeholderImg from '/static/producto.jpeg'
 var DEFAULT_SLUG = 'misnietas';
 var currentNegocio = null;
@@ -259,7 +257,6 @@ var LS_TELEFONO = 'umasushiTelefonoCliente';
 var deliveryMap = null;
 var deliveryMarker = null;
 var deliveryZoneLayers = [];
-var addressSearchTimeout = null;
 
 function getDeliveryCoordsStored() {
     try {
@@ -333,18 +330,14 @@ function renderMenu() {
         const nombre = p.nombre || '';
         const precio = Number(p.precio) || 0;
         const desc = p.descripcion || '';
-        const img = p.imagen || placeholderImg;
-        const gluten = p.tags && p.tags.glutenfree !== false ? glutenfreeImg : '';
-        const veg = p.tags && p.tags.veggi ? veggiImg : '';
+        const imagenes = Array.isArray(p.imagenes) && p.imagenes.length ? p.imagenes : [p.imagen || placeholderImg];
+        const img = imagenes[0] || placeholderImg;
+        const multi = imagenes.length > 1;
         return `
           <div class="product-card product-card--compact" data-product-id="${umasushiEscapeHtml(p.id)}" data-product-name="${umasushiEscapeHtml(nombre)}" data-product-price="${precio}">
             <div class="product-main">
               <div class="product-header">
-                <h4>${umasushiEscapeHtml(nombre)}</h4>
-                <div class="product-icons">
-                  ${gluten ? `<img src="${gluten}" class="icon-gluten" alt="Sin gluten">` : ''}
-                  ${veg ? `<img src="${veg}" class="icon-veggi" alt="Veggie">` : ''}
-                </div>
+                <h4 class="product-title" data-zoom-id="${umasushiEscapeHtml(p.id)}" role="button" tabindex="0">${umasushiEscapeHtml(nombre)}</h4>
               </div>
               <p class="product-desc">${umasushiEscapeHtml(desc)}</p>
               <p class="price">$${precio}</p>
@@ -357,7 +350,11 @@ function renderMenu() {
               </div>
             </div>
             <div class="product-side">
-              <img src="${umasushiEscapeHtml(img)}" alt="${umasushiEscapeHtml(nombre)}" class="product-img">
+              <button type="button" class="product-img-btn" data-zoom-id="${umasushiEscapeHtml(p.id)}" aria-label="Ampliar foto de ${umasushiEscapeHtml(nombre)}">
+                <img src="${umasushiEscapeHtml(img)}" alt="${umasushiEscapeHtml(nombre)}" class="product-img">
+                ${multi ? `<span class="product-img-count">📷 ${imagenes.length}</span>` : ''}
+                <span class="product-img-zoom" aria-hidden="true">⤢</span>
+              </button>
             </div>
           </div>`;
     }
@@ -369,8 +366,14 @@ function renderMenu() {
         byCat[c].push(p);
     });
 
+    // Orden de las secciones: respetamos el orden definido por el negocio
+    // (currentNegocio.secciones); las categorías sin lugar en esa lista
+    // (datos viejos) van al final.
+    const secciones = (currentNegocio && Array.isArray(currentNegocio.secciones)) ? currentNegocio.secciones : [];
     const catList = Object.keys(byCat);
-    const categoriasConProductos = catList.filter(cat => (byCat[cat] || []).length > 0);
+    const categoriasConProductos = [];
+    secciones.forEach(s => { if ((byCat[s] || []).length) categoriasConProductos.push(s); });
+    catList.forEach(c => { if (categoriasConProductos.indexOf(c) === -1 && (byCat[c] || []).length) categoriasConProductos.push(c); });
 
     // Renderizar navegación de tabs horizontal
     const tabsHtml = `
@@ -389,10 +392,9 @@ function renderMenu() {
         const items = byCat[cat] || [];
         if (!items.length) return '';
         const sectionId = 'menu-section-' + umasushiEscapeHtml(cat).toLowerCase().replace(/\s+/g, '-');
-        const sufijo = cat === 'Productos' ? ' — 4 piezas' : cat === 'Tablas' ? ' — 20 piezas' : '';
         return `
           <div class="menu-section" id="${sectionId}">
-            <h3>${umasushiEscapeHtml(cat)}${sufijo}</h3>
+            <h3>${umasushiEscapeHtml(cat)}</h3>
             <div class="products-grid">
               ${items.map(cardHtml).join('')}
             </div>
@@ -464,7 +466,99 @@ function renderMenu() {
             else decrementarProducto(name);
         });
     });
+
+    // Ampliar foto: tocar la imagen o el nombre abre el lightbox con carrusel.
+    if (host.dataset.zoomBound !== '1') {
+        host.dataset.zoomBound = '1';
+        host.addEventListener('click', function (e) {
+            const z = e.target.closest('[data-zoom-id]');
+            if (!z) return;
+            openLightbox(z.getAttribute('data-zoom-id'));
+        });
+        host.addEventListener('keydown', function (e) {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            const z = e.target.closest('.product-title[data-zoom-id]');
+            if (!z) return;
+            e.preventDefault();
+            openLightbox(z.getAttribute('data-zoom-id'));
+        });
+    }
+
     actualizarContadores();
+}
+
+// Lightbox con carrusel de fotos del producto (flechas, puntitos, swipe, Esc).
+function openLightbox(productId) {
+    const prod = buscarProductoPorId(productId);
+    if (!prod) return;
+    let imgs = Array.isArray(prod.imagenes) && prod.imagenes.length ? prod.imagenes.slice() : [];
+    if (!imgs.length && prod.imagen) imgs = [prod.imagen];
+    if (!imgs.length) return;
+
+    let idx = 0;
+    const multi = imgs.length > 1;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'lightbox-overlay';
+    overlay.innerHTML = `
+        <div class="lightbox-card">
+            <button type="button" class="lightbox-close" aria-label="Cerrar">✕</button>
+            <div class="lightbox-stage">
+                <button type="button" class="lightbox-nav lightbox-prev" aria-label="Anterior">‹</button>
+                <img class="lightbox-img" src="${umasushiEscapeHtml(imgs[0])}" alt="${umasushiEscapeHtml(prod.nombre || '')}">
+                <button type="button" class="lightbox-nav lightbox-next" aria-label="Siguiente">›</button>
+            </div>
+            <div class="lightbox-caption">${umasushiEscapeHtml(prod.nombre || '')}</div>
+            <div class="lightbox-dots"></div>
+        </div>`;
+
+    const imgEl = overlay.querySelector('.lightbox-img');
+    const dots = overlay.querySelector('.lightbox-dots');
+    const prevBtn = overlay.querySelector('.lightbox-prev');
+    const nextBtn = overlay.querySelector('.lightbox-next');
+    const stage = overlay.querySelector('.lightbox-stage');
+    prevBtn.style.display = multi ? '' : 'none';
+    nextBtn.style.display = multi ? '' : 'none';
+
+    function renderDots() {
+        if (!multi) { dots.innerHTML = ''; return; }
+        dots.innerHTML = imgs.map((_, i) => `<span class="lightbox-dot${i === idx ? ' active' : ''}" data-i="${i}"></span>`).join('');
+    }
+    function show(i) {
+        idx = (i + imgs.length) % imgs.length;
+        imgEl.src = imgs[idx];
+        renderDots();
+    }
+    renderDots();
+
+    function close() {
+        overlay.remove();
+        document.removeEventListener('keydown', onKey);
+    }
+    function onKey(e) {
+        if (e.key === 'Escape') close();
+        else if (multi && e.key === 'ArrowLeft') show(idx - 1);
+        else if (multi && e.key === 'ArrowRight') show(idx + 1);
+    }
+    document.addEventListener('keydown', onKey);
+    overlay.querySelector('.lightbox-close').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+    prevBtn.addEventListener('click', () => show(idx - 1));
+    nextBtn.addEventListener('click', () => show(idx + 1));
+    dots.addEventListener('click', e => {
+        const d = e.target.closest('[data-i]');
+        if (d) show(Number(d.dataset.i));
+    });
+
+    let startX = 0;
+    stage.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend', e => {
+        if (!multi) return;
+        const dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
+    });
+
+    document.body.appendChild(overlay);
 }
 
 function incrementarProducto(nombreProducto) {
@@ -486,7 +580,6 @@ function incrementarProducto(nombreProducto) {
             // infla localStorage y dispara QuotaExceededError en Safari iOS (cuota chica) => el carrito
             // "no suma". La imagen se resuelve por id/nombre desde el menú en renderPedido().
             categoria: producto.categoria || 'Productos',
-            veggi: !!(producto.tags && producto.tags.veggi),
             cantidad: 1
         });
     }
@@ -839,12 +932,10 @@ function searchAddressAndCenterMap(query) {
             if (!result || !result.coords) {
                 throw new Error('No se encontró la dirección');
             }
-            var input = getEl('direccion-input');
-            if (input) {
-                input.value = result.address_text || query;
-            }
+            // Respetamos lo tipeado: el botón solo ubica el pin, no reescribe
+            // la dirección que puso el usuario.
             setDeliveryMarker(result.coords, true);
-            updateDeliveryStatusText('Dirección actualizada. Ajustá manualmente si hace falta y guardá ubicación.');
+            updateDeliveryStatusText('Pin ubicado en tu dirección. Ajustalo en el mapa si hace falta.');
         })
         .catch(function (err) {
             updateDeliveryStatusText('Tocá el mapa para marcar tu ubicación exacta.');
@@ -853,46 +944,33 @@ function searchAddressAndCenterMap(query) {
 }
 
 function reverseGeocodeAndFillInput(coords) {
-    if (!coords || typeof reverseGeocodeCoords !== 'function') {
-        removeLS(LS_DELIVERY_GUARDADA);
+    if (!coords) return;
+    removeLS(LS_DELIVERY_GUARDADA);
+    var input = getEl('direccion-input');
+    var previousText = input ? input.value.trim() : '';
+
+    // Respetamos lo que escribió el usuario: si ya hay texto, el mapa solo
+    // mueve el pin (no reescribe la dirección). Solo autocompletamos el texto
+    // cuando el campo está vacío.
+    if (previousText || typeof reverseGeocodeCoords !== 'function') {
         setDeliveryMarker(coords, true);
+        updateDeliveryStatusText('Pin actualizado. Tu dirección se respeta tal cual la escribiste.');
         return;
     }
 
-    removeLS(LS_DELIVERY_GUARDADA);
     updateDeliveryStatusText('Obteniendo dirección...');
-    var input = getEl('direccion-input');
-    var previousText = input ? input.value.trim() : '';
-    reverseGeocodeCoords(coords, previousText)
+    reverseGeocodeCoords(coords, '')
         .then(function (result) {
-            var input = getEl('direccion-input');
-            if (input) {
-                input.value = result.address_text || previousText || '';
-            }
+            var inp = getEl('direccion-input');
+            if (inp && !inp.value.trim()) inp.value = result.address_text || '';
             setDeliveryMarker(result.coords, true);
-            updateDeliveryStatusText('Dirección detectada. Corre el número si es necesario, luego guardá ubicación.');
+            updateDeliveryStatusText('Dirección detectada. Ajustá el pin o el texto si hace falta.');
         })
         .catch(function (err) {
             console.error('[nominatim] Error de reverse geocode:', err);
             setDeliveryMarker(coords, true);
-            updateDeliveryStatusText('Ubicación marcada. Ajustá manualmente la dirección si es necesario.');
-            setDeliveryError('No se pudo recuperar la dirección exacta.');
+            updateDeliveryStatusText('Ubicación marcada. Escribí tu dirección arriba si querés.');
         });
-}
-
-function debounceAddressSearch() {
-    if (addressSearchTimeout) {
-        clearTimeout(addressSearchTimeout);
-    }
-    addressSearchTimeout = setTimeout(function () {
-        var input = getEl('direccion-input');
-        if (input) {
-            var query = input.value.trim();
-            if (query.length >= 3) {
-                searchAddressAndCenterMap(query);
-            }
-        }
-    }, 800);
 }
 
 function saveDeliveryLocation() {
@@ -1057,6 +1135,7 @@ function initDeliveryMap() {
     }
 
     var input = getEl('direccion-input');
+    var sugerencias = getEl('direccion-sugerencias');
     if (input) {
         input.addEventListener('input', function () {
             setDeliveryError('');
@@ -1065,22 +1144,23 @@ function initDeliveryMap() {
                 removeLS(LS_DELIVERY_COORDS);
                 removeLS(LS_DELIVERY_MAPS);
                 removeLS(LS_DELIVERY_TEXTO);
-                updateDeliveryStatusText('Tocá el mapa para marcar tu ubicación exacta.');
+                updateDeliveryStatusText('Elegí tu dirección de la lista o tocá el mapa.');
                 updateDeliveryZoneStatus('');
                 actualizarTotal();
             }
-            debounceAddressSearch();
         });
 
-        input.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                var query = input.value.trim();
-                if (query.length >= 3) {
-                    searchAddressAndCenterMap(query);
-                }
-            }
-        });
+        // Autocompletado tipo Google: sugerencias mientras se escribe. Al elegir
+        // una se completa el texto y se marca el mapa; después se puede corregir
+        // el pin sin que se reescriba la dirección.
+        if (sugerencias && typeof initNominatimAutocomplete === 'function') {
+            initNominatimAutocomplete(input, sugerencias, function (sel) {
+                if (!sel || !sel.coords) return;
+                input.value = sel.address_text || sel.display_name || input.value;
+                setDeliveryMarker(sel.coords, true);
+                updateDeliveryStatusText('Dirección seleccionada. Ajustá el pin en el mapa si hace falta.');
+            });
+        }
     }
 }
 

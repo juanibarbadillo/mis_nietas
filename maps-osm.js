@@ -163,12 +163,16 @@ function initNominatimAutocomplete(inputEl, listEl, onSelect) {
 
         const coords = { lat: lat, lng: lng };
         const displayName = res.display_name || res.name || inputEl.value.trim();
+        // Texto corto (calle + número, barrio/ciudad) para completar el input,
+        // en vez del display_name larguísimo de Nominatim.
+        const shortText = formatShortAddress(res, inputEl.value.trim());
 
         console.log('[nominatim] Selección:', displayName, coords);
 
         if (typeof onSelect === 'function') {
             onSelect({
                 display_name: displayName,
+                address_text: shortText || displayName,
                 coords: coords,
                 osm_id: res.osm_id || null,
                 osm_type: res.osm_type || null
@@ -189,7 +193,7 @@ function initNominatimAutocomplete(inputEl, listEl, onSelect) {
         }
 
         const searchQuery = `${query.trim()}, San Rafael, Mendoza, Argentina`;
-        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=jsonv2&limit=5&countrycodes=ar`;
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(searchQuery)}&format=jsonv2&addressdetails=1&limit=5&countrycodes=ar`;
 
         console.log('[nominatim] Buscando:', searchQuery);
 

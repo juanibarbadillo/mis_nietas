@@ -8,7 +8,7 @@ export async function obtenerNegocioPorSlug(slug) {
 
     const { data, error } = await supabase
         .from('negocios_public')
-        .select('id, slug, nombre_negocio, telefono_negocio, tema')
+        .select('id, slug, nombre_negocio, telefono_negocio, tema, secciones')
         .eq('slug', slug)
         .maybeSingle()
     if (error) {
@@ -71,7 +71,8 @@ export async function actualizarNegocio(id, updates) {
     const allowed = [
         'nombre_negocio',
         'telefono_negocio',
-        'tema'
+        'tema',
+        'secciones'
     ]
     const safe = {}
     for (const k of allowed) {

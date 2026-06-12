@@ -119,10 +119,13 @@
                     <div id="ubicacion-section" class="field-block ubicacion-modern">
                         <label for="direccion-input">Dirección para delivery</label>
                         <div class="direccion-input-row">
-                            <input type="text" id="direccion-input" class="inp-modern direccion-main" autocomplete="street-address" placeholder="Calle y número">
+                            <div class="direccion-autocomplete">
+                                <input type="text" id="direccion-input" class="inp-modern direccion-main" autocomplete="off" placeholder="Calle y número (ej. San Martín 1234)">
+                                <div id="direccion-sugerencias" class="autocomplete-list" hidden></div>
+                            </div>
                             <button type="button" id="direccion-buscar" class="btn-secondary">Buscar en mapa</button>
                         </div>
-                        <p id="direccion-estado" class="direccion-mini muted">Tocá el mapa para marcar tu ubicación exacta.</p>
+                        <p id="direccion-estado" class="direccion-mini muted">Escribí tu dirección y elegila de la lista. Después podés ajustar el pin en el mapa.</p>
                         <div id="delivery-map" class="umai-map"></div>
                         <div class="direccion-actions">
                             <button type="button" id="guardar-ubicacion-btn" class="btn-primary">Guardar ubicación</button>

@@ -774,3 +774,111 @@ body.dashboard-body .direccion-sugerencias-dropdown {
     .dash-page-header h2 { font-size: 1.6rem; }
     .dash-form-card { padding: 20px; }
 }
+
+/* ============================================================
+   Catálogo · galería de fotos, administrador de secciones y
+   cropper cuadrado (agregado en 2026-06-11)
+   ============================================================ */
+.dash-page-header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+.dash-hint { color: var(--color-desc); font-size: 12.5px; margin: 0 0 14px; line-height: 1.5; }
+.dash-hint-inline { color: var(--color-desc); font-weight: 400; font-size: 12px; }
+.dash-link-btn {
+    background: none; border: none; padding: 4px 0 0; margin: 0;
+    color: var(--color-primary); font-family: inherit; font-size: 12.5px;
+    font-weight: 600; cursor: pointer; text-decoration: underline;
+}
+.dash-img-status { font-size: 12px; margin: 6px 0 0; color: var(--color-desc); }
+.dash-img-status.ok { color: #1f7a1f; }
+.dash-img-status.err { color: #c0392b; }
+
+/* Galería de producto */
+.dash-galeria { display: flex; gap: 10px; flex-wrap: wrap; }
+.dash-galeria-thumb {
+    position: relative; width: 84px; height: 84px; border-radius: 12px;
+    overflow: hidden; background: #f5f5f5; border: 1px solid rgba(15,73,15,0.1);
+    flex-shrink: 0;
+}
+.dash-galeria-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dash-galeria-thumb .badge-principal {
+    position: absolute; top: 4px; left: 4px; background: var(--color-primary);
+    color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px;
+    border-radius: 999px; letter-spacing: .3px;
+}
+.dash-galeria-thumb-actions {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; gap: 2px;
+    background: rgba(0,0,0,0.45); padding: 3px;
+}
+.dash-galeria-thumb-actions button {
+    flex: 1; background: none; border: none; color: #fff; cursor: pointer;
+    font-size: 11px; line-height: 1; padding: 3px 0; font-family: inherit;
+    border-radius: 4px;
+}
+.dash-galeria-thumb-actions button:hover { background: rgba(255,255,255,0.2); }
+.dash-galeria-add {
+    width: 84px; height: 84px; border-radius: 12px; flex-shrink: 0;
+    border: 1.5px dashed rgba(15,73,15,0.3); background: #fafaf8;
+    color: var(--color-primary); cursor: pointer; font-family: inherit;
+    font-size: 12px; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 2px;
+}
+.dash-galeria-add:hover { border-color: var(--color-primary); background: #f3f6f3; }
+.dash-galeria-add .plus { font-size: 22px; line-height: 1; }
+.dash-galeria-add[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* Administrador de secciones */
+.dash-secciones-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.dash-seccion-row {
+    display: flex; gap: 6px; align-items: center;
+    background: #fafaf8; border: 1px solid rgba(15,73,15,0.08);
+    border-radius: 10px; padding: 6px 8px;
+}
+.dash-seccion-row .dash-seccion-nombre {
+    flex: 1; min-width: 0; border: 1px solid transparent; background: transparent;
+    font-family: inherit; font-size: 14px; padding: 6px 8px; border-radius: 6px;
+    color: var(--color-text);
+}
+.dash-seccion-row .dash-seccion-nombre:focus { border-color: var(--color-primary); background: #fff; outline: none; }
+.dash-seccion-row .dash-seccion-count { font-size: 11px; color: var(--color-desc); white-space: nowrap; }
+.dash-seccion-row button {
+    border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer;
+    width: 30px; height: 30px; font-size: 14px; line-height: 1; flex-shrink: 0;
+    font-family: inherit; color: var(--color-text);
+}
+.dash-seccion-row button:hover:not([disabled]) { border-color: var(--color-primary); color: var(--color-primary); }
+.dash-seccion-row button[disabled] { opacity: .35; cursor: not-allowed; }
+.dash-seccion-row button.btn-del:hover { border-color: #c0392b; color: #c0392b; }
+.dash-secciones-add { display: flex; gap: 8px; margin-bottom: 8px; }
+.dash-secciones-add input {
+    flex: 1; border: 1.5px solid #ddd; border-radius: 8px; padding: 9px 12px;
+    font-family: inherit; font-size: 14px;
+}
+
+/* Cropper cuadrado */
+.cropper-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center; z-index: 2000;
+    padding: 16px;
+}
+.cropper-card {
+    background: #fff; border-radius: 16px; padding: 20px;
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 92vw;
+}
+.cropper-title { margin: 0; font-size: 1.15rem; color: var(--color-text); font-weight: 700; }
+.cropper-hint { margin: 0; font-size: 12px; color: var(--color-desc); text-align: center; }
+.cropper-stage {
+    position: relative; border-radius: 12px; overflow: hidden;
+    background: #222; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.6);
+}
+.cropper-canvas { display: block; touch-action: none; cursor: grab; }
+.cropper-canvas:active { cursor: grabbing; }
+.cropper-zoom { width: 100%; accent-color: var(--color-primary); }
+.cropper-actions { display: flex; gap: 10px; width: 100%; }
+.cropper-actions button {
+    flex: 1; padding: 10px; border-radius: 10px; font-family: inherit;
+    font-size: 14px; font-weight: 600; cursor: pointer; border: 1.5px solid #ddd;
+    background: #fff; color: var(--color-text);
+}
+.cropper-actions .cropper-confirm { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }

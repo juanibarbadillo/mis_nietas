@@ -2853,3 +2853,74 @@ body { padding-top: 90px; }
 }
 
 
+
+/* ============================================================
+   Catálogo · foto ampliable + lightbox con carrusel (2026-06-11)
+   ============================================================ */
+.product-title { cursor: pointer; }
+.product-title:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+
+.product-img-btn {
+    position: relative; padding: 0; border: none; background: none;
+    cursor: zoom-in; display: block; border-radius: 18px; line-height: 0;
+}
+.product-img-count {
+    position: absolute; bottom: 6px; left: 6px;
+    background: rgba(0,0,0,0.6); color: #fff; font-size: 11px; font-weight: 600;
+    padding: 2px 7px; border-radius: 999px; line-height: 1.4;
+}
+.product-img-zoom {
+    position: absolute; top: 6px; right: 6px;
+    background: rgba(0,0,0,0.5); color: #fff; font-size: 13px;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity .2s ease;
+}
+.product-img-btn:hover .product-img-zoom { opacity: 1; }
+
+.lightbox-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 3000; padding: 20px;
+}
+.lightbox-card { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 96vw; }
+.lightbox-close {
+    align-self: flex-end; background: rgba(255,255,255,0.15); color: #fff;
+    border: none; width: 38px; height: 38px; border-radius: 50%; cursor: pointer;
+    font-size: 17px; line-height: 1;
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.3); }
+.lightbox-stage { position: relative; display: flex; align-items: center; justify-content: center; }
+.lightbox-img {
+    max-width: min(86vw, 560px); max-height: 72vh; border-radius: 14px;
+    object-fit: contain; background: #fff; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.lightbox-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,0.45); color: #fff; border: none;
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+    font-size: 26px; line-height: 1; display: flex; align-items: center; justify-content: center;
+}
+.lightbox-nav:hover { background: rgba(0,0,0,0.7); }
+.lightbox-prev { left: 8px; }
+.lightbox-next { right: 8px; }
+.lightbox-caption { color: #fff; font-size: 15px; font-weight: 600; text-align: center; }
+.lightbox-dots { display: flex; gap: 7px; }
+.lightbox-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; }
+.lightbox-dot.active { background: #fff; }
+
+@media (max-width: 600px) {
+    .lightbox-nav { width: 38px; height: 38px; font-size: 22px; }
+    .lightbox-img { max-height: 66vh; }
+}
+
+/* Autocompletado de dirección — dropdown bajo el input (2026-06-11) */
+.direccion-autocomplete { position: relative; flex: 1 1 220px; }
+.direccion-autocomplete input { width: 100%; }
+.autocomplete-list {
+    position: absolute; top: calc(100% + 4px); left: 0; right: 0; z-index: 1200;
+    background: #fff; border: 1px solid #e0e0e0; border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.12);
+    overflow: hidden; max-height: 260px; overflow-y: auto;
+}
+.autocomplete-list[hidden] { display: none; }

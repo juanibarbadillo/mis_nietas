@@ -10,7 +10,7 @@ export async function obtenerProductos(opciones = {}) {
     const soloActivos = opciones && opciones.soloActivos === false ? false : true
 
     try {
-        let query = supabase.from('productos').select('id, nombre, descripcion, precio, categoria, imagen, activo, es_extra, tags, orden')
+        let query = supabase.from('productos').select('id, nombre, descripcion, precio, categoria, imagen, imagenes, activo, es_extra, tags, orden')
         if (soloActivos) query = query.eq('activo', true)
         if (negocioId) query = query.eq('negocio_id', negocioId)
         query = query.order('categoria', { ascending: true }).order('orden', { ascending: true })
@@ -90,6 +90,29 @@ export async function actualizarProducto(id, updates) {
     } catch (e) {
         console.error('[productos] Excepción actualizando:', e.message)
         return null
+    }
+}
+
+// Renombra una sección: actualiza la categoría de todos los productos del
+// negocio que estaban en `oldName`. Lo usa el administrador de secciones.
+export async function renombrarCategoria(negocioId, oldName, newName) {
+    const supabase = getSupabase()
+    if (!supabase || !isSupabaseReady()) return false
+    if (!negocioId || !oldName || !newName || oldName === newName) return false
+
+    try {
+        const { error } = await supabase.from('productos')
+            .update({ categoria: newName })
+            .eq('negocio_id', negocioId)
+            .eq('categoria', oldName)
+        if (error) {
+            console.error('[productos] Error renombrando categoría:', error.message)
+            return false
+        }
+        return true
+    } catch (e) {
+        console.error('[productos] Excepción renombrando categoría:', e.message)
+        return false
     }
 }
 
