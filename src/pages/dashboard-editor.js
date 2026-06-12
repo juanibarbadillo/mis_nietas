@@ -5,6 +5,7 @@
 // Reemplaza al viejo panel de Apariencia (reutiliza su lógica).
 import { bootstrapDashPage } from '../../shared/dashboard-shell.js'
 import { actualizarNegocio } from '../../services/negocios.service.js'
+import { actualizarProducto } from '../../services/productos.service.js'
 import { subirImagenBranding } from '../../services/storage.service.js'
 import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, TEXT_GROUPS, IMAGE_FIELDS, SECCIONES_SITIO, DEFAULT_WA_TEMPLATE, WA_TOKENS, findById, findPreset } from '../../theme-config.js'
 
@@ -346,6 +347,13 @@ const selCard = document.getElementById('ap-card-seleccion')
 const selInput = document.getElementById('ap-sel-input')
 const selTitle = document.getElementById('ap-sel-title')
 const selHint = document.getElementById('ap-sel-hint')
+const prodCard = document.getElementById('ap-card-producto')
+const prodNombre = document.getElementById('ap-prod-nombre')
+const prodDesc = document.getElementById('ap-prod-desc')
+
+// Cambios de texto de productos pendientes de guardar: { id: { nombre?, descripcion? } }
+let productoSelId = null
+const productosEditados = {}
 
 function isMobile() { return window.matchMedia('(max-width: 920px)').matches }
 
@@ -360,6 +368,7 @@ function selectKey(key, opts = {}) {
     selInput.placeholder = field.placeholder || 'Escribí el texto…'
     selInput.rows = field.textarea ? 4 : 2
     selCard.hidden = false
+    prodCard.hidden = true
 
     if (!opts.fromPanel) {
         // Vino de un click en el sitio: abrir panel (mobile) y enfocar.
@@ -377,6 +386,27 @@ selInput.addEventListener('input', () => {
     applyToIframe()
 })
 
+// Producto del catálogo: editar nombre/descripción en vivo (se persiste al Guardar).
+function selectProducto(p) {
+    selCard.hidden = true
+    selectedKey = null
+    productoSelId = p.id
+    prodNombre.value = p.nombre || ''
+    prodDesc.value = p.descripcion || ''
+    prodCard.hidden = false
+    if (isMobile()) panel.classList.add('open')
+    prodCard.scrollIntoView({ block: 'nearest' })
+    prodNombre.focus()
+}
+function onProdInput(campo, el) {
+    if (!productoSelId) return
+    if (!productosEditados[productoSelId]) productosEditados[productoSelId] = {}
+    productosEditados[productoSelId][campo] = el.value
+    postToFrame({ type: 'editor:apply-producto', id: productoSelId, campo, value: el.value })
+}
+prodNombre.addEventListener('input', () => onProdInput('nombre', prodNombre))
+prodDesc.addEventListener('input', () => onProdInput('descripcion', prodDesc))
+
 // ---- Mensajes del iframe ----
 window.addEventListener('message', (e) => {
     if (e.origin !== window.location.origin || !e.data || typeof e.data !== 'object') return
@@ -387,6 +417,8 @@ window.addEventListener('message', (e) => {
     } else if (m.type === 'editor:select' && m.key) {
         if (m.kind === 'image') selectImage(m.key)
         else selectKey(m.key, { fromPanel: false })
+    } else if (m.type === 'editor:select-producto' && m.id) {
+        selectProducto(m)
     }
 })
 
@@ -395,6 +427,7 @@ function selectImage(key) {
     const field = document.querySelector(`.ap-img-field[data-key="${key}"]`)
     if (!field) return
     selCard.hidden = true
+    prodCard.hidden = true
     selectedKey = null
     if (isMobile()) panel.classList.add('open')
     document.querySelectorAll('.ap-img-field.sel').forEach(f => f.classList.remove('sel'))
@@ -421,7 +454,10 @@ function setupToolbar(negocio) {
         if (!confirm('¿Descartar los cambios sin guardar y volver a la última versión guardada?')) return
         aplicarTemaAlPanel(savedTema)
         selCard.hidden = true
+        prodCard.hidden = true
         selectedKey = null
+        productoSelId = null
+        Object.keys(productosEditados).forEach(id => delete productosEditados[id])
         // Recargar el iframe = reset limpio de la vista a lo último guardado.
         frameReady = false
         try { frame.contentWindow.location.reload() } catch (e) { applyToIframe() }
@@ -445,10 +481,21 @@ function setupToolbar(negocio) {
             mensaje_wa: waVal
         }
         const actualizado = await actualizarNegocio(negocio.id, { tema: nuevoTema })
+
+        // Persistir los textos de producto editados (nombre/descripción).
+        let prodFallos = 0
+        const ids = Object.keys(productosEditados)
+        for (const id of ids) {
+            const ok = await actualizarProducto(id, productosEditados[id])
+            if (!ok) prodFallos++
+        }
+
         btn.disabled = false; btn.textContent = 'Guardar'
-        if (!actualizado) { showFeedback('Error al guardar. Reintentá.', false); return }
+        if (!actualizado) { showFeedback('Error al guardar la apariencia. Reintentá.', false); return }
         savedTema = actualizado.tema || nuevoTema
         negocio.tema = savedTema
+        if (prodFallos) { showFeedback(`Apariencia guardada, pero fallaron ${prodFallos} producto(s).`, false); return }
+        ids.forEach(id => delete productosEditados[id])
         showFeedback('✓ Guardado y publicado.', true)
     })
 }

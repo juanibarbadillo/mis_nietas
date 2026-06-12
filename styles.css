@@ -2952,3 +2952,7 @@ body { padding-top: 90px; }
 }
 .editor-mode .sticky-bar,
 .editor-mode .whatsapp-float { display: none !important; }
+
+/* Modo edición: tarjetas de producto (editar nombre/descripción) */
+.editor-mode .product-card { cursor: pointer; }
+.editor-mode .product-card:hover { outline: 2px solid var(--color-accent, #b07a2e); outline-offset: 3px; }

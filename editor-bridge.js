@@ -57,6 +57,20 @@ export function initEditorBridge() {
                 setSelected(editable)
                 send({ type: 'editor:select', key: info.key, kind: info.kind })
             }
+            return
+        }
+        // Producto del catálogo: tocar la tarjeta → editar nombre/descripción.
+        const card = e.target.closest('[data-product-id]')
+        if (card) {
+            const titleEl = card.querySelector('.product-title')
+            const descEl = card.querySelector('.product-desc')
+            setSelected(card)
+            send({
+                type: 'editor:select-producto',
+                id: card.getAttribute('data-product-id'),
+                nombre: titleEl ? titleEl.textContent.trim() : '',
+                descripcion: descEl ? descEl.textContent.trim() : ''
+            })
         } else {
             setSelected(null)
         }
@@ -71,6 +85,13 @@ export function initEditorBridge() {
         const m = e.data
         if (m.type === 'editor:apply' && m.tema) {
             applyTema(m.tema)
+        } else if (m.type === 'editor:apply-producto' && m.id) {
+            const card = document.querySelector(`[data-product-id="${cssEscape(m.id)}"]`)
+            if (card) {
+                const sel = m.campo === 'descripcion' ? '.product-desc' : '.product-title'
+                const el = card.querySelector(sel)
+                if (el) el.textContent = m.value
+            }
         } else if (m.type === 'editor:highlight' && m.key) {
             const el = findByKey(m.key)
             if (el) {
