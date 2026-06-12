@@ -6,7 +6,7 @@
 import { bootstrapDashPage } from '../../shared/dashboard-shell.js'
 import { actualizarNegocio } from '../../services/negocios.service.js'
 import { subirImagenBranding } from '../../services/storage.service.js'
-import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, TEXT_GROUPS, IMAGE_FIELDS, DEFAULT_WA_TEMPLATE, WA_TOKENS, findById, findPreset } from '../../theme-config.js'
+import { PRESETS, COLOR_VARS, COLOR_LABELS, FONTS, FONT_ACENTO, TEXT_GROUPS, IMAGE_FIELDS, SECCIONES_SITIO, DEFAULT_WA_TEMPLATE, WA_TOKENS, findById, findPreset } from '../../theme-config.js'
 
 const imagenesState = {}
 const COLOR_ORDER = ['primary', 'accent', 'secondary', 'bg', 'text', 'desc', 'border']
@@ -16,6 +16,10 @@ const DEFAULT_FUENTES = { titulos: 'fraunces', texto: 'system', acento: 'caveat'
 // key -> { label, placeholder, textarea, grupo } para el editor de "selección".
 const FIELD_BY_KEY = {}
 TEXT_GROUPS.forEach(g => g.campos.forEach(c => { FIELD_BY_KEY[c.key] = { ...c, grupo: g.titulo } }))
+
+const SEC_LABEL = {}
+SECCIONES_SITIO.forEach(s => { SEC_LABEL[s.id] = s.label })
+let layoutState = { orden: SECCIONES_SITIO.map(s => s.id), ocultas: [] }
 
 const frame = document.getElementById('editor-frame')
 let frameReady = false
@@ -266,6 +270,58 @@ function markActivePreset(id) {
     document.querySelectorAll('.ap-preset').forEach(b => b.classList.toggle('active', !!id && b.dataset.preset === id))
 }
 
+// ---- Secciones del inicio (orden + mostrar/ocultar) ----
+function initLayout(tema) {
+    const def = SECCIONES_SITIO.map(s => s.id)
+    const L = (tema && tema.layout && typeof tema.layout === 'object') ? tema.layout : {}
+    let orden = Array.isArray(L.orden) ? L.orden.filter(id => def.indexOf(id) !== -1) : []
+    def.forEach(id => { if (orden.indexOf(id) === -1) orden.push(id) })
+    const ocultas = Array.isArray(L.ocultas) ? L.ocultas.filter(id => def.indexOf(id) !== -1) : []
+    layoutState = { orden, ocultas }
+}
+function layoutActual() {
+    return { orden: layoutState.orden.slice(), ocultas: layoutState.ocultas.slice() }
+}
+function renderSecciones() {
+    const cont = document.getElementById('ap-secciones')
+    if (!cont) return
+    cont.innerHTML = layoutState.orden.map((id, i) => {
+        const oculta = layoutState.ocultas.indexOf(id) !== -1
+        return `
+        <div class="ap-seccion-row${oculta ? ' oculta' : ''}" data-id="${id}">
+            <button type="button" class="ap-sec-btn ap-sec-vis" data-act="vis" title="${oculta ? 'Mostrar' : 'Ocultar'}">${oculta ? '🙈' : '👁'}</button>
+            <span class="ap-seccion-label">${SEC_LABEL[id] || id}</span>
+            <button type="button" class="ap-sec-btn" data-act="up" title="Subir" ${i === 0 ? 'disabled' : ''}>↑</button>
+            <button type="button" class="ap-sec-btn" data-act="down" title="Bajar" ${i === layoutState.orden.length - 1 ? 'disabled' : ''}>↓</button>
+        </div>`
+    }).join('')
+}
+function buildSecciones() {
+    const cont = document.getElementById('ap-secciones')
+    if (!cont) return
+    cont.addEventListener('click', e => {
+        const btn = e.target.closest('[data-act]')
+        if (!btn) return
+        const row = btn.closest('.ap-seccion-row')
+        if (!row) return
+        const id = row.dataset.id
+        const i = layoutState.orden.indexOf(id)
+        const act = btn.dataset.act
+        if (act === 'vis') {
+            const k = layoutState.ocultas.indexOf(id)
+            if (k === -1) layoutState.ocultas.push(id); else layoutState.ocultas.splice(k, 1)
+        } else if (act === 'up' && i > 0) {
+            const t = layoutState.orden[i - 1]; layoutState.orden[i - 1] = layoutState.orden[i]; layoutState.orden[i] = t
+        } else if (act === 'down' && i < layoutState.orden.length - 1) {
+            const t = layoutState.orden[i + 1]; layoutState.orden[i + 1] = layoutState.orden[i]; layoutState.orden[i] = t
+        } else {
+            return
+        }
+        renderSecciones()
+        applyToIframe()
+    })
+}
+
 // ---- Vista en vivo (iframe) ----
 function temaPreview() {
     // Mandamos sólo los textos que el usuario realmente cargó (igual que al
@@ -275,7 +331,8 @@ function temaPreview() {
         colores: readColores(),
         fuentes: readFuentes(),
         textos: readTextos(),
-        imagenes: { ...imagenesState }
+        imagenes: { ...imagenesState },
+        layout: layoutActual()
     }
 }
 function applyToIframe() {
@@ -384,6 +441,7 @@ function setupToolbar(negocio) {
             fuentes: readFuentes(),
             textos: readTextos(),
             imagenes: { ...imagenesState },
+            layout: layoutActual(),
             mensaje_wa: waVal
         }
         const actualizado = await actualizarNegocio(negocio.id, { tema: nuevoTema })
@@ -406,6 +464,8 @@ function aplicarTemaAlPanel(tema) {
     document.getElementById('ap-wa-template').value =
         (typeof t.mensaje_wa === 'string' && t.mensaje_wa.trim()) ? t.mensaje_wa : DEFAULT_WA_TEMPLATE
     markActivePreset(t.preset && findPreset(t.preset) ? t.preset : null)
+    initLayout(t)
+    renderSecciones()
     // refrescar thumbnails de imágenes
     IMAGE_FIELDS.forEach(f => {
         const thumb = document.querySelector(`img[data-thumb="${f.key}"]`)
@@ -444,6 +504,7 @@ function aplicarTemaAlPanel(tema) {
     buildTextos()
     buildImagenes(negocio.id)
     buildWaSection()
+    buildSecciones()
 
     aplicarTemaAlPanel(savedTema)
     setupToolbar(negocio)

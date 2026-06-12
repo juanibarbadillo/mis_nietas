@@ -7,15 +7,6 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Julius+Sans+One&display=swap');
 
-@font-face {
-    font-family: 'Bristol';
-    src: url('/fonts/Bristol.otf') format('opentype');
-}
-@font-face {
-    font-family: 'MoreSugar';
-    src: url('/fonts/MoreSugar-Regular.otf') format('opentype');
-}
-
 :root {
     --color-primary: #0f490f;
     --color-primary-dark: #0a350a;
@@ -337,7 +328,7 @@ body.dashboard-body .direccion-sugerencias-dropdown {
     font-weight: 700;
     color: var(--color-primary);
     text-decoration: none;
-    font-family: 'Bristol', serif;
+    font-family: 'Julius Sans One', serif;
     letter-spacing: -0.5px;
     transition: color 0.3s ease;
 }
@@ -973,3 +964,14 @@ body.dashboard-body .direccion-sugerencias-dropdown {
     .editor-panel-scroll { max-height: calc(82vh - 50px); }
 }
 .ap-img-field.sel { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+/* Secciones del inicio (orden + mostrar/ocultar) */
+.ap-secciones { display: flex; flex-direction: column; gap: 8px; }
+.ap-seccion-row { display: flex; align-items: center; gap: 6px; background: #fafaf8; border: 1px solid rgba(15,73,15,0.08); border-radius: 10px; padding: 6px 8px; }
+.ap-seccion-row.oculta { opacity: .55; }
+.ap-seccion-label { flex: 1; min-width: 0; font-size: 13.5px; color: var(--color-text); }
+.ap-seccion-row.oculta .ap-seccion-label { text-decoration: line-through; }
+.ap-sec-btn { border: 1px solid #ddd; background: #fff; border-radius: 6px; cursor: pointer; width: 30px; height: 30px; font-size: 13px; line-height: 1; flex-shrink: 0; font-family: inherit; }
+.ap-sec-btn:hover:not([disabled]) { border-color: var(--color-primary); color: var(--color-primary); }
+.ap-sec-btn[disabled] { opacity: .35; cursor: not-allowed; }
+.ap-sec-vis { font-size: 14px; }

@@ -4,7 +4,7 @@
 // ausente se deja con el valor por defecto del CSS/HTML (fallback),
 // así la página nunca queda rota.
 // ============================================================
-import { COLOR_VARS, FONTS, FONT_ACENTO, findById } from './theme-config.js'
+import { COLOR_VARS, FONTS, FONT_ACENTO, SECCIONES_SITIO, findById } from './theme-config.js'
 
 function injectGoogleFont(googleSpec) {
     if (!googleSpec) return
@@ -96,6 +96,32 @@ function applyImagenes(imagenes) {
     }
 }
 
+// Orden y visibilidad de las secciones del inicio.
+//   layout = { orden: [ids...], ocultas: [ids...] }
+// Reordena las <section data-seccion> entre sí (las deja antes del footer) y
+// oculta las marcadas. Corre también para los visitantes reales. Idempotente.
+function applyLayout(layout) {
+    const secciones = Array.from(document.querySelectorAll('[data-seccion]'))
+    if (!secciones.length) return
+    const byId = {}
+    secciones.forEach(el => { byId[el.getAttribute('data-seccion')] = el })
+    const defOrden = SECCIONES_SITIO.map(s => s.id)
+
+    const ocultas = (layout && Array.isArray(layout.ocultas)) ? layout.ocultas : []
+    secciones.forEach(el => {
+        el.style.display = ocultas.indexOf(el.getAttribute('data-seccion')) !== -1 ? 'none' : ''
+    })
+
+    let orden = (layout && Array.isArray(layout.orden) && layout.orden.length) ? layout.orden.slice() : defOrden.slice()
+    orden = orden.filter(id => byId[id])
+    defOrden.forEach(id => { if (orden.indexOf(id) === -1 && byId[id]) orden.push(id) })
+
+    const parent = secciones[0].parentNode
+    const footer = parent.querySelector('footer')
+    const anchor = footer || null
+    orden.forEach(id => { if (byId[id]) parent.insertBefore(byId[id], anchor) })
+}
+
 // SEO: solo en la home (donde existe el hero), para no pisar el título
 // funcional de la página de pedido.
 function applySeo(textos) {
@@ -122,5 +148,6 @@ export function applyTema(tema) {
     applyFuentes(tema.fuentes)
     applyTextos(tema.textos)
     applyImagenes(tema.imagenes)
+    applyLayout(tema.layout)
     applySeo(tema.textos)
 }

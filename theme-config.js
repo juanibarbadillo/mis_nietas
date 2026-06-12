@@ -222,6 +222,17 @@ export const WA_TOKENS = [
     { token: '{link}', desc: 'Link al detalle del pedido' }
 ]
 
+// Secciones del inicio que se pueden reordenar y mostrar/ocultar desde el
+// editor. El `id` se corresponde con data-seccion="id" en u/index.html; este
+// array define también el orden por defecto y las etiquetas legibles.
+export const SECCIONES_SITIO = [
+    { id: 'hero', label: 'Portada' },
+    { id: 'trust', label: 'Franja de confianza' },
+    { id: 'menu', label: 'Catálogo' },
+    { id: 'nosotros', label: 'Nosotros' },
+    { id: 'horarios', label: 'Horarios y contacto' }
+]
+
 export function findById(list, id) {
     if (!id) return null;
     return list.find(x => x.id === id) || null;
