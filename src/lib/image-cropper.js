@@ -75,9 +75,10 @@ function iniciarCropper(img, url, size, resolve) {
 
     function clamp() {
         const dw = nw * scale, dh = nh * scale
-        // Por eje: si tapa el cuadrado, lo mantenemos cubierto; si entra con
-        // huecos, lo dejamos moverse pero adentro del cuadrado.
-        ox = dw >= V ? Math.min(0, Math.max(V - dw, ox)) : Math.min(V - dw, Math.max(0, ox))
+        // Horizontal: SIEMPRE centrado (no se puede correr a los costados).
+        ox = (V - dw) / 2
+        // Vertical: si tapa el cuadrado lo mantenemos cubierto; si entra con
+        // huecos lo dejamos moverse pero adentro del cuadrado.
         oy = dh >= V ? Math.min(0, Math.max(V - dh, oy)) : Math.min(V - dh, Math.max(0, oy))
     }
 
