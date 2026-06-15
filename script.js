@@ -542,9 +542,28 @@ function openLightbox(productId) {
     }
     renderDots();
 
+    // Bloquear el scroll del fondo mientras el visor está abierto. Fijamos el
+    // body (robusto también en iOS) y restauramos la posición al cerrar.
+    const scrollLockY = window.scrollY || window.pageYOffset || 0;
+    function lockScroll() {
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollLockY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+    }
+    function unlockScroll() {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+        window.scrollTo(0, scrollLockY);
+    }
     function close() {
         overlay.remove();
         document.removeEventListener('keydown', onKey);
+        unlockScroll();
     }
     function onKey(e) {
         if (e.key === 'Escape') close();
@@ -569,6 +588,7 @@ function openLightbox(productId) {
         if (Math.abs(dx) > 40) show(idx + (dx < 0 ? 1 : -1));
     });
 
+    lockScroll();
     document.body.appendChild(overlay);
 }
 
