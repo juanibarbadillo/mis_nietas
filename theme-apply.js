@@ -74,11 +74,12 @@ function applyImagenes(imagenes) {
         if (v) el.setAttribute('src', v)
     })
 
-    // Fondo del hero (mantiene posición/cover del CSS)
+    // Foto del hero: la pinta la capa .hero::before vía la variable --hero-img
+    // (así se puede difuminar sin afectar el texto).
     const hero = get('hero')
     if (hero) {
         const el = document.querySelector('.hero')
-        if (el) el.style.backgroundImage = `url("${hero}")`
+        if (el) el.style.setProperty('--hero-img', `url("${hero}")`)
     }
 
     // Favicon

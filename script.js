@@ -17,14 +17,69 @@ function getSlugFromUrl() {
     return DEFAULT_SLUG;
 }
 
+var NEG_CACHE_KEY = 'misnietas_negocio_cache';
+var NEG_CACHE_TTL_MS = 30 * 60 * 1000;
+
+function leerNegocioCache(slug) {
+    try {
+        var raw = localStorage.getItem(NEG_CACHE_KEY);
+        if (!raw) return null;
+        var p = JSON.parse(raw);
+        if (!p || p.slug !== slug) return null;
+        if (Date.now() - (p.t || 0) > NEG_CACHE_TTL_MS) return null;
+        return p.data || null;
+    } catch (e) { return null; }
+}
+function guardarNegocioCache(slug, data) {
+    try { localStorage.setItem(NEG_CACHE_KEY, JSON.stringify({ slug: slug, t: Date.now(), data: data })); } catch (e) { /* localStorage lleno */ }
+}
+
+// Siempre refresca por red y actualiza la caché. Si el fetch falla (offline),
+// conserva lo que ya estuviera en currentNegocio (la caché pintada al inicio).
 async function resolverNegocioActual() {
-    if (currentNegocio) return currentNegocio;
     const slug = getSlugFromUrl();
     await awaitSupabaseReady();
-    currentNegocio = await obtenerNegocioPorSlug(slug);
-    if (!currentNegocio) {
+    const fresco = await obtenerNegocioPorSlug(slug);
+    if (fresco) {
+        currentNegocio = fresco;
+        guardarNegocioCache(slug, fresco);
     }
     return currentNegocio;
+}
+
+// Nombre / teléfono / botón flotante de WhatsApp a partir del negocio.
+function aplicarDatosNegocio(n) {
+    if (!n) return;
+    const nombreEl = document.getElementById('negocio-nombre');
+    if (nombreEl && n.nombre_negocio) nombreEl.textContent = n.nombre_negocio;
+    const footerTel = document.getElementById('footer-tel');
+    if (footerTel && n.telefono_negocio) footerTel.textContent = 'Telefono: +' + n.telefono_negocio;
+    if (n.telefono_negocio) {
+        const waFloat = document.getElementById('wa-float');
+        if (waFloat) {
+            waFloat.href = 'https://wa.me/' + n.telefono_negocio + '?text=Hola!%20Quiero%20hacer%20un%20pedido%20en%20' + encodeURIComponent(n.nombre_negocio || '') + '%20🫙';
+            waFloat.hidden = false;
+        }
+    }
+}
+
+// Pinta al instante lo que haya en caché (tema/foto/colores + catálogo) sin
+// esperar la red. Después, el flujo normal refresca y re-dibuja.
+function pintarDesdeCache() {
+    const slug = getSlugFromUrl();
+    const negCache = leerNegocioCache(slug);
+    if (negCache) {
+        currentNegocio = negCache;
+        window.currentNegocio = currentNegocio;
+        if (negCache.tema) applyTema(negCache.tema);
+        aplicarDatosNegocio(negCache);
+    }
+    const prodCache = cargarCacheLocal();
+    if (prodCache && prodCache.length && !window.location.pathname.includes('pedido.html')) {
+        setProductosCache(prodCache);
+        renderMenu();
+        actualizarContadores();
+    }
 }
 
 // Animación de fade-in al hacer scroll
@@ -43,28 +98,17 @@ document.addEventListener('DOMContentLoaded', async function () {
         sections.forEach(section => observer.observe(section));
     }
 
-    // ===== CARGA DE DATOS (solo Supabase) =====
-    // 1. Resolver negocio por slug
-    // 2. Productos del negocio → productosCache (menu-store.js)
-    // 3. Zonas del negocio    → umasushiZonasCache (order-shared.js)
+    // ===== CARGA DE DATOS =====
+    // 0. Pintar al instante desde caché (negocio + catálogo), sin esperar red.
+    // 1. Refrescar negocio por red → re-aplicar tema/datos.
+    // 2. Productos del negocio → productosCache (menu-store.js).
+    // 3. Zonas del negocio    → umasushiZonasCache (order-shared.js).
+    pintarDesdeCache();
+
     await resolverNegocioActual();
     window.currentNegocio = currentNegocio;
-
-    // Aplicar personalización visual (colores, fuentes, textos) lo antes posible
     if (currentNegocio && currentNegocio.tema) applyTema(currentNegocio.tema);
-
-    const n = currentNegocio;
-    const nombreEl = document.getElementById('negocio-nombre');
-    if (nombreEl && n && n.nombre_negocio) nombreEl.textContent = n.nombre_negocio;
-    const footerTel = document.getElementById('footer-tel');
-    if (footerTel && n && n.telefono_negocio) footerTel.textContent = 'Telefono: +' + n.telefono_negocio;
-    if (n && n.telefono_negocio) {
-        const waFloat = document.getElementById('wa-float');
-        if (waFloat) {
-            waFloat.href = 'https://wa.me/' + n.telefono_negocio + '?text=Hola!%20Quiero%20hacer%20un%20pedido%20en%20' + encodeURIComponent(n.nombre_negocio || '') + '%20🫙';
-            waFloat.hidden = false;
-        }
-    }
+    aplicarDatosNegocio(currentNegocio);
 
     await Promise.all([
         cargarProductosConSupabase(),

@@ -2642,10 +2642,22 @@ body.no-scroll {
 
 /* ---- HERO con foto ---- */
 .hero {
-    background: #3a2a1c url('/img/hero.jpg') center 35% / cover no-repeat;
+    background: #3a2a1c;
     min-height: min(72vh, 640px);
     padding: 92px 20px 72px;
     border-bottom: 5px solid var(--color-accent);
+    overflow: hidden;
+}
+/* La foto del hero va en una capa propia para difuminarla apenas sin afectar al
+   texto. --hero-img la setea theme-apply (foto custom); si no hay, usa el default. */
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: var(--hero-img, url('/img/hero.jpg')) center 35% / cover no-repeat;
+    filter: blur(3px);
+    transform: scale(1.06);
 }
 .hero-overlay {
     display: block;
