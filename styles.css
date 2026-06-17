@@ -149,7 +149,8 @@ section.fade-in {
 
 #hero,
 .hero,
-#cocina {
+#cocina,
+#menu {
     opacity: 1;
     transform: none;
 }
