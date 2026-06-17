@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
-    "leaflet": "^1.9.4",
-    "puppeteer-core": "^25.1.0"
+    "leaflet": "^1.9.4"
   }
 }
