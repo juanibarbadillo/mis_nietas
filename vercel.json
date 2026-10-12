@@ -23,5 +23,8 @@
         { "key": "Permissions-Policy", "value": "geolocation=(), camera=(), microphone=(), bluetooth=(), usb=(), serial=(), midi=()" }
       ]
     }
+  ],
+  "crons": [
+    { "path": "/api/keepalive", "schedule": "0 9 * * *" }
   ]
 }
